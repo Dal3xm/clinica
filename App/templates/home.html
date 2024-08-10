@@ -1,0 +1,15 @@
+{% extends 'nav.html' %}
+
+{% block content %}
+<h1>Inicio</h1>
+
+{% if request.user.is_authenticated %}
+    <h4>{{user.username | upper}}, Hola</h4>
+    
+{% else %}
+
+{% endif %}
+
+
+
+{% endblock %}

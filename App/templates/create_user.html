@@ -1,0 +1,64 @@
+{% extends "nav.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if form.instance.pk %}Editar Usuario{% else %}Nuevo Usuario{% endif %} - Farmacia Las Américas</title>
+    {% block extra_css %}
+    <link type='text/css' href='{% static "css/formStyle.css" %}' rel='stylesheet'/>
+    {% endblock %}
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+{% block content %}
+<body>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="form-container">
+            <img src='{% static "img/logo.png" %}' alt="Logo Farmacia Las Américas">
+            <form method="post">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    {{ form.username }}
+                </div>
+                <div class="form-group">
+                    {{ form.first_name }}
+                </div>
+                <div class="form-group">
+                    {{ form.last_name }}
+                </div>
+                <div class="form-group">
+                    {{ form.email }}
+                </div>
+                <div class="form-group">
+                    {{ form.password1 }}
+                </div>
+                <div class="form-group">
+                    {{ form.password2 }}
+                </div>
+                <div class="form-group">
+                    {{ form.group.label_tag }} 
+                    {{ form.group }}
+                </div>
+                <button type="submit" class="btn btn-success btn-block">{% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Usuario</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+{% endblock %}
+</html>

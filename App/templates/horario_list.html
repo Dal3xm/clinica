@@ -1,0 +1,15 @@
+{% extends 'nav.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Lista de Horarios</h2>
+    <ul class="list-group">
+        {% for horario in horarios %}
+            <li class="list-group-item">
+                {{ horario.medico.username }} - {{ horario.dia }}: {{ horario.hora_inicio }} - {{ horario.hora_fin }}
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'horario_create' %}" class="btn btn-primary mt-3">Asignar Nuevo Horario</a>
+</div>
+{% endblock %}

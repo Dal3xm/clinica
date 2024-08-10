@@ -1,0 +1,26 @@
+body {
+    background-image: url('/static/img/background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0; /* Añadido para eliminar márgenes por defecto */
+}
+
+.login-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px; /* Ancho fijo */
+    max-width: 100%; /* Asegura que no exceda el ancho de la pantalla */
+    overflow: auto; /* Añade scroll si el contenido es más grande */
+}
+
+.login-container img {
+    width: 100px;
+    margin-bottom: 20px;
+}
