@@ -15,15 +15,15 @@
         <h1>Lista de Usuarios</h1>
         <a href="{% url 'user_create' %}" class="btn btn-primary mb-3">Crear Usuario</a>
         <ul class="list-group">
-            {% for user, groups in users_with_groups %}
+            {% for user in users %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
-                        {{ user.username }} - {{ user.first_name }}  {{ user.last_name}} - {{ user.email }} - {% for group in groups %}
-                        {{ group.name }}{% if not forloop.last %}, {% endif %}
-                      {% endfor %}
+                        {{ user.username }} - {{ user.first_name }} {{ user.last_name }} - {{ user.email }} - 
+                        {{ user.userprofile.get_tipo_usuario_display }}
                     </div>
                     <div>
-                        <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning">Editar Usuario</a>
+                        <a href="{% url 'user_profile_edit' user.pk %}" class="btn btn-sm btn-info">Editar Perfil</a>
                         <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
                     </div>
                 </li>

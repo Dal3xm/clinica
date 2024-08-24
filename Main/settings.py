@@ -82,7 +82,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_matazano',
+        'NAME': 'db_matazano2',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',

@@ -1,17 +1,17 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinica Matazano</title>
+    <title>{% block title %}Clinica Matazano{% endblock %}</title>
     <link type='text/css' href='{% static "css/baseStyle.css" %}' rel='stylesheet'/>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="#">Clinica Matazano</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -21,27 +21,21 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}">Inicio</a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="#">Citas</a>
                 </li>
-
-                {% if is_admin %}
                 <li class="nav-item">
                     <a class="nav-link" href="#">Horarios</a>
                 </li>
-                {% endif %}
-
-                {% if is_admin %}
+                <!-- Mostrar Usuarios solo para Administradores -->
+                {% if request.user.profile.tipo_usuario == 'administrador' %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'user_list' %}">Usuarios</a>
                 </li>
                 {% endif %}
-
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'patient_profile_detail' %}">Perfil</a>
+                    <a class="nav-link" href="{% url 'edit_user_profile' %}">Perfil</a>
                 </li>
-
                 {% if request.user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'exit' %}">Salir</a>
@@ -55,7 +49,52 @@
         </div>
     </nav>
 
-    {% block content %} {% endblock %}
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2">
+                <div class="bg-dark text-white" id="sidebar">
+                    <div class="d-flex flex-column align-items-start px-3 pt-2 min-vh-100">
+                        <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                            <span class="fs-5">Menú</span>
+                        </a>
+                        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+                            <li>
+                                <a href="{% url 'cita_list' %}" class="nav-link text-white">
+                                    <i class="fas fa-calendar-alt"></i> Citas
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'horario_list' %}" class="nav-link text-white">
+                                    <i class="fas fa-clock"></i> Horarios
+                                </a>
+                            </li>
+                            <!-- Mostrar Usuarios solo para Administradores -->
+                            {% if request.user.profile.tipo_usuario == 'administrador' %}
+                            <li>
+                                <a href="{% url 'user_list' %}" class="nav-link text-white">
+                                    <i class="fas fa-users"></i> Usuarios
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="{% url 'user_profile_detail' %}" class="nav-link text-white">
+                                    <i class="fas fa-user"></i> Perfil
+                                </a>
+                            </li>
+                        </ul>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>

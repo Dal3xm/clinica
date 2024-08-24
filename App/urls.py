@@ -1,8 +1,14 @@
 # app/urls.py
 
 from django.urls import path
-from .views import loginView, home, exit, defaultView, UserListView, UserCreateView, UserUpdateView, UserDeleteView, PatientSignUpView,PatientProfileDetailView,PatientProfileUpdateView
-from .views import HorarioListView, HorarioCreateView
+from .views import loginView, home, exit, defaultView, UserListView, UserCreateView, UserUpdateView, UserDeleteView
+from .views import (
+    HistorialClinicoListView, HistorialClinicoDetailView, HistorialClinicoCreateView, HistorialClinicoUpdateView, 
+    HistorialClinicoDeleteView, EditUserProfileView, UserProfileEditView, UserProfileDetailView,UserSelfUpdateView, PatientSignUpView,
+    HorarioListView,HorarioUpdateView,HorarioDeleteView)
+
+from .views import HorarioListView, HorarioCreateView, HorarioUpdateView, HorarioDeleteView, HorarioDetailView
+from .views import CitaListView, CitaCreateView, CitaUpdateView, CitaDeleteView, CitaDetailView
 
 urlpatterns = [
     path('', defaultView, name='defaultView'),
@@ -12,9 +18,32 @@ urlpatterns = [
     path('users/new/', UserCreateView.as_view(), name='user_create'),
     path('users/<int:pk>/edit/', UserUpdateView.as_view(), name='user_edit'),
     path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user_delete'),
-    path('signup/', PatientSignUpView.as_view(), name='patient_signup'),  # Nueva ruta para registro de pacientes
-    path('profile/', PatientProfileDetailView.as_view(), name='patient_profile_detail'),
-    path('profile/edit/', PatientProfileUpdateView.as_view(), name='patient_profile_edit'),
+    path('signup/', PatientSignUpView.as_view(), name='patient_signup'),
+
+    path('profile/', UserProfileDetailView.as_view(), name='user_profile_detail'),
+    path('users/<int:pk>/edit-profile/', UserProfileEditView.as_view(), name='user_profile_edit'), #listado admin
+    path('profile/edit/', EditUserProfileView.as_view(), name='edit_user_profile'), #propio
+    path('user/edit/', UserSelfUpdateView.as_view(), name='edit_user_self'),
+    
+    
     path('horarios/', HorarioListView.as_view(), name='horario_list'),
     path('horarios/nuevo/', HorarioCreateView.as_view(), name='horario_create'),
+    path('horarios/<int:pk>/', HorarioDetailView.as_view(), name='horario_detail'),
+    path('horarios/<int:pk>/editar/', HorarioUpdateView.as_view(), name='horario_edit'),
+    path('horarios/<int:pk>/eliminar/', HorarioDeleteView.as_view(), name='horario_delete'),
+
+    path('citas/', CitaListView.as_view(), name='cita_list'),
+    path('citas/nueva/', CitaCreateView.as_view(), name='cita_create'),
+    path('citas/<int:pk>/', CitaDetailView.as_view(), name='cita_detail'),
+    path('citas/<int:pk>/editar/', CitaUpdateView.as_view(), name='cita_edit'),
+    path('citas/<int:pk>/eliminar/', CitaDeleteView.as_view(), name='cita_delete'),
+
+    # URLs para Historial Clinico
+    path('historiales/', HistorialClinicoListView.as_view(), name='historial_list'),
+    path('historiales/<int:pk>/', HistorialClinicoDetailView.as_view(), name='historial_detail'),
+    path('historiales/nuevo/', HistorialClinicoCreateView.as_view(), name='historial_create'),
+    path('historiales/<int:pk>/editar/', HistorialClinicoUpdateView.as_view(), name='historial_edit'),
+    path('historiales/<int:pk>/eliminar/', HistorialClinicoDeleteView.as_view(), name='historial_delete'),
 ]
+
+

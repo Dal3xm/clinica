@@ -12,7 +12,7 @@
 <body>
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="form-container">
-            <img src='{% static "img/logo.jpg" %}' alt="Logo Farmacia Las Américas">
+            <img src='{% static "img/logo.png" %}' alt="Logo">
             <form method="post">
                 {% csrf_token %}
                 {% if form.errors %}
@@ -44,6 +44,35 @@
                 </div>
                 <div class="form-group">
                     {{ form.password2 }}
+                </div>
+                <!-- Campos adicionales específicos de paciente -->
+                <div class="form-group">
+                    {{ form.dpi.label_tag }} 
+                    {{ form.dpi }}
+                </div>
+                <div class="form-group">
+                    {{ form.fecha_nacimiento.label_tag }} 
+                    {{ form.fecha_nacimiento }}
+                </div>
+                <div class="form-group">
+                    {{ form.direccion.label_tag }} 
+                    {{ form.direccion }}
+                </div>
+                <div class="form-group">
+                    {{ form.telefono.label_tag }} 
+                    {{ form.telefono }}
+                </div>
+                <div class="form-group">
+                    {{ form.seguro_medico.label_tag }} 
+                    {{ form.seguro_medico }}
+                </div>
+                <div class="form-group">
+                    {{ form.blood_type.label_tag }} 
+                    {{ form.blood_type }}
+                </div>
+                <div class="form-group">
+                    {{ form.conditions.label_tag }} 
+                    {{ form.conditions }}
                 </div>
                 <button type="submit" class="btn btn-success btn-block">Registrar</button>
             </form>

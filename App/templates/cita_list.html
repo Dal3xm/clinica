@@ -1,0 +1,38 @@
+{% extends "nav.html" %}
+
+{% block content %}
+  <h1>Lista de Citas</h1>
+  
+  <a href="{% url 'cita_create' %}" class="btn btn-primary mb-3">Crear Nueva Cita</a>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Horario</th>
+        <th>Estado</th>
+        <th>Fecha de Creación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cita in citas %}
+        <tr>
+          <td>{{ cita.usuario }}</td>
+          <td>{{ cita.horario }}</td>
+          <td>{{ cita.get_estado_display }}</td>
+          <td>{{ cita.fecha_creacion }}</td>
+          <td>
+            <a href="{% url 'cita_detail' cita.pk %}" class="btn btn-info btn-sm">Ver</a>
+            <a href="{% url 'cita_edit' cita.pk %}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5">No hay citas disponibles.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

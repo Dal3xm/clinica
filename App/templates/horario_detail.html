@@ -1,0 +1,16 @@
+{% extends "nav.html" %}
+
+{% block content %}
+  <h1>Detalles del Horario</h1>
+  
+  <ul class="list-group">
+    <li class="list-group-item"><strong>Médico:</strong> {{ horario.medico }}</li>
+    <li class="list-group-item"><strong>Día:</strong> {{ horario.dia }}</li>
+    <li class="list-group-item"><strong>Horario:</strong> {{ horario.get_horario_display }}</li>
+    <li class="list-group-item"><strong>Disponible:</strong> {{ horario.disponible|yesno:"Sí,No" }}</li>
+  </ul>
+
+  <a href="{% url 'horario_edit' horario.pk %}" class="btn btn-warning mt-3">Editar</a>
+  <a href="{% url 'horario_delete' horario.pk %}" class="btn btn-danger mt-3">Eliminar</a>
+  <a href="{% url 'horario_list' %}" class="btn btn-secondary mt-3">Volver a la lista de horarios</a>
+{% endblock %}

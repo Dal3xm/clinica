@@ -1,0 +1,16 @@
+{% extends "nav.html" %}
+
+{% block content %}
+  <h1>Detalles de la Cita</h1>
+  
+  <ul class="list-group">
+    <li class="list-group-item"><strong>Usuario:</strong> {{ cita.usuario }}</li>
+    <li class="list-group-item"><strong>Horario:</strong> {{ cita.horario }}</li>
+    <li class="list-group-item"><strong>Estado:</strong> {{ cita.get_estado_display }}</li>
+    <li class="list-group-item"><strong>Fecha de Creación:</strong> {{ cita.fecha_creacion }}</li>
+  </ul>
+
+  <a href="{% url 'cita_edit' cita.pk %}" class="btn btn-warning mt-3">Editar</a>
+  <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger mt-3">Eliminar</a>
+  <a href="{% url 'cita_list' %}" class="btn btn-secondary mt-3">Volver a la lista de citas</a>
+{% endblock %}

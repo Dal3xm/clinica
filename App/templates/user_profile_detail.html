@@ -1,0 +1,37 @@
+{% extends "nav.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Informacion de usuario</h1>
+    <p><strong>Nombre de usuario:</strong> {{ profile.user.username }}</p>
+    <p><strong>Nombre:</strong> {{ profile.user.first_name }}</p>
+    <p><strong>Apellido:</strong> {{ profile.user.last_name }}</p>
+    <p><strong>Email:</strong> {{ profile.user.email }}</p>
+    <p><strong>Tipo de Usuario:</strong> {{ profile.get_tipo_usuario_display }}</p>
+
+    <a href="{% url 'edit_user_self' %}" class="btn btn-primary">Editar Usuario</a>
+
+    {% if profile.tipo_usuario == 'paciente' %}
+        <h3>Perfil de Paciente</h3>
+        <p><strong>DPI:</strong> {{ profile_data.dpi }}</p>
+        <p><strong>Fecha de Nacimiento:</strong> {{ profile_data.fecha_nacimiento }}</p>
+        <p><strong>Dirección:</strong> {{ profile_data.direccion }}</p>
+        <p><strong>Teléfono:</strong> {{ profile_data.telefono }}</p>
+        <p><strong>Seguro Médico:</strong> {{ profile_data.seguro_medico }}</p>
+        <p><strong>Tipo de Sangre:</strong> {{ profile_data.blood_type }}</p>
+    {% elif profile.tipo_usuario == 'medico' %}
+        <h3>Perfil de Médico</h3>
+        <p><strong>Colegiado:</strong> {{ profile_data.colegiado }}</p>
+        <p><strong>DPI:</strong> {{ profile_data.dpi }}</p>
+        <p><strong>Teléfono:</strong> {{ profile_data.telefono }}</p>
+        <p><strong>Dirección:</strong> {{ profile_data.direccion }}</p>
+        <p><strong>Especialidad:</strong> {{ profile_data.especialidad }}</p>
+    {% elif profile.tipo_usuario == 'secretaria' %}
+        <h3>Perfil de Secretaria</h3>
+        <p><strong>DPI:</strong> {{ profile_data.dpi }}</p>
+        <p><strong>Teléfono:</strong> {{ profile_data.telefono }}</p>
+        <p><strong>Dirección:</strong> {{ profile_data.direccion }}</p>
+    {% endif %}
+    
+    <a href="{% url 'edit_user_profile' %}" class="btn btn-primary">Editar Perfil</a>
+</div>
+{% endblock %}

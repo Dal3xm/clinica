@@ -1,0 +1,13 @@
+{% extends "nav.html" %}
+
+{% block content %}
+  <h1>Eliminar Horario</h1>
+  
+  <p>¿Estás seguro que deseas eliminar el horario para el médico {{ object.medico }} el día {{ object.dia }} a las {{ object.get_horario_display }}?</p>
+  
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'horario_list' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+{% endblock %}
