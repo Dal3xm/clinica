@@ -235,8 +235,12 @@ class UserProfileDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'profile'
 
     def get_object(self):
-        # Obtiene el perfil del usuario autenticado
-        user_profile = get_object_or_404(UserProfile, user=self.request.user)
+        # Verifica si hay un 'pk' en la URL, lo usa para obtener el perfil de ese usuario
+        if 'pk' in self.kwargs:
+            user_profile = get_object_or_404(UserProfile, pk=self.kwargs['pk'])
+        else:
+            # Si no hay 'pk', usa el perfil del usuario autenticado
+            user_profile = get_object_or_404(UserProfile, user=self.request.user)
         return user_profile
 
     def get_context_data(self, **kwargs):
@@ -288,6 +292,35 @@ class HistorialClinicoDeleteView(DeleteView):
 
 
 
+class PacienteHistorialClinicoListView(ListView):
+    model = HistorialClinico
+    template_name = 'paciente_historiales.html'
+    context_object_name = 'historiales_clinicos'
+
+    def get_queryset(self):
+        # Obtener el perfil del usuario a través del 'pk' en la URL
+        user_profile = get_object_or_404(UserProfile, pk=self.kwargs.get('pk'))
+        
+        # Verificar si el perfil es de un paciente
+        if hasattr(user_profile, 'paciente_profile'):
+            paciente = user_profile.paciente_profile
+            return HistorialClinico.objects.filter(paciente=paciente)
+        else:
+            # Si no es un paciente, devolver un queryset vacío
+            return HistorialClinico.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_profile = get_object_or_404(UserProfile, pk=self.kwargs.get('pk'))
+        
+        # Agregar el paciente al contexto si es un paciente
+        if hasattr(user_profile, 'paciente_profile'):
+            context['paciente'] = user_profile.paciente_profile
+        else:
+            context['paciente'] = None  # No es un paciente
+        
+        return context
+    
 #############vista horarios############
 
 from django.urls import reverse_lazy
@@ -394,7 +427,7 @@ class CitaDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         # Admins y secretarias pueden ver cualquier cita, pacientes solo las suyas
-        if self.request.user.profile.tipo_usuario in ['administrador', 'secretaria']:
+        if self.request.user.profile.tipo_usuario in ['administrador', 'secretaria','medico']:
             return Cita.objects.all()
         return Cita.objects.filter(usuario=self.request.user)
 
@@ -405,11 +438,24 @@ class CitaListView(LoginRequiredMixin, ListView):
     context_object_name = 'citas'
 
     def get_queryset(self):
-        # Admins y secretarias pueden ver todas las citas, pacientes solo las suyas
-        if self.request.user.profile.tipo_usuario in ['administrador', 'secretaria']:
+        user_profile = self.request.user.profile
+        tipo_usuario = user_profile.tipo_usuario
+
+        # Admins y secretarias pueden ver todas las citas
+        if tipo_usuario in ['administrador', 'secretaria']:
             return Cita.objects.all()
-        return Cita.objects.filter(usuario=self.request.user)
-    
+        
+        # Pacientes solo pueden ver sus propias citas
+        elif tipo_usuario == 'paciente':
+            return Cita.objects.filter(usuario=self.request.user)
+        
+        # Médicos pueden ver las citas de sus horarios
+        elif tipo_usuario == 'medico':
+            # Filtrar citas basadas en los horarios asignados al médico
+            return Cita.objects.filter(horario__medico=user_profile.medico_profile)
+        
+        # Devolver un queryset vacío por defecto
+        return Cita.objects.none()
 
 
 # ####################Otras vistas existentes###########

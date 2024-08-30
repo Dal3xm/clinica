@@ -1,0 +1,13 @@
+<!-- historial_form.html -->
+
+{% extends "nav.html" %}
+
+{% block content %}
+    <h2>{% if form.instance.pk %}Editar Historial Clínico{% else %}Crear Historial Clínico{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+    <a href="{% url 'historial_list' %}">Volver a la lista</a>
+{% endblock %}

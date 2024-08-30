@@ -8,7 +8,7 @@ from .views import (
     HorarioListView,HorarioUpdateView,HorarioDeleteView)
 
 from .views import HorarioListView, HorarioCreateView, HorarioUpdateView, HorarioDeleteView, HorarioDetailView
-from .views import CitaListView, CitaCreateView, CitaUpdateView, CitaDeleteView, CitaDetailView
+from .views import CitaListView, CitaCreateView, CitaUpdateView, CitaDeleteView, CitaDetailView, PacienteHistorialClinicoListView
 
 urlpatterns = [
     path('', defaultView, name='defaultView'),
@@ -42,8 +42,12 @@ urlpatterns = [
     path('historiales/', HistorialClinicoListView.as_view(), name='historial_list'),
     path('historiales/<int:pk>/', HistorialClinicoDetailView.as_view(), name='historial_detail'),
     path('historiales/nuevo/', HistorialClinicoCreateView.as_view(), name='historial_create'),
-    path('historiales/<int:pk>/editar/', HistorialClinicoUpdateView.as_view(), name='historial_edit'),
-    path('historiales/<int:pk>/eliminar/', HistorialClinicoDeleteView.as_view(), name='historial_delete'),
+    path('historiales/editar/<int:pk>/', HistorialClinicoUpdateView.as_view(), name='historial_update'),
+    path('historiales/eliminar/<int:pk>/', HistorialClinicoDeleteView.as_view(), name='historial_delete'),
+    
+    path('pacientes/<int:pk>/historiales/', PacienteHistorialClinicoListView.as_view(), name='paciente_historiales'),
+    path('pacientes/<int:pk>/perfil/', UserProfileDetailView.as_view(), name='paciente_profile'),
+
 ]
 
 

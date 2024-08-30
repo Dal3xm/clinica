@@ -1,0 +1,38 @@
+{% extends "nav.html" %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h1>Lista de Historiales Clínicos</h1>
+    
+    <a href="{% url 'historial_create' %}" class="btn btn-primary mb-3">Crear nuevo historial clínico</a>
+    
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Fecha</th>
+          <th>Diagnóstico</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for historial in historiales_clinicos %}
+          <tr>
+            <td>{{ historial.paciente }}</td>
+            <td>{{ historial.fecha }}</td>
+            <td>{{ historial.diagnostico|truncatewords:10 }}</td>
+            <td>
+              <a href="{% url 'historial_detail' historial.pk %}" class="btn btn-info btn-sm">Ver</a>
+              <a href="{% url 'historial_update' historial.pk %}" class="btn btn-warning btn-sm">Editar</a>
+              <a href="{% url 'historial_delete' historial.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">No hay historiales clínicos disponibles.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

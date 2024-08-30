@@ -1,0 +1,15 @@
+<!-- historial_detail.html -->
+
+{% extends "nav.html" %}
+
+{% block content %}
+    <h2>Historial Clínico de {{ historial_clinico.paciente }}</h2>
+    <p><strong>Fecha:</strong> {{ historial_clinico.fecha }}</p>
+    <p><strong>Diagnóstico:</strong> {{ historial_clinico.diagnostico }}</p>
+    <p><strong>Tratamiento:</strong> {{ historial_clinico.tratamiento }}</p>
+    <p><strong>Observaciones:</strong> {{ historial_clinico.observaciones }}</p>
+
+    <a href="{% url 'historial_update' historial_clinico.pk %}">Editar</a> |
+    <a href="{% url 'historial_delete' historial_clinico.pk %}">Eliminar</a> |
+    <a href="{% url 'historial_list' %}">Volver a la lista</a>
+{% endblock %}

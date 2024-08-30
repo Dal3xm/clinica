@@ -22,6 +22,7 @@
                         {{ user.userprofile.get_tipo_usuario_display }}
                     </div>
                     <div>
+                        <a href="{% url 'paciente_historiales' user.pk %}" class="btn btn-sm btn-success">Ver Historiales Clínicos</a>
                         <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning">Editar Usuario</a>
                         <a href="{% url 'user_profile_edit' user.pk %}" class="btn btn-sm btn-info">Editar Perfil</a>
                         <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-danger">Eliminar</a>

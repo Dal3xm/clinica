@@ -1,0 +1,40 @@
+{% extends "nav.html" %}
+
+{% block content %}
+  <div class="container mt-5">
+    {% if paciente %}
+      <h1>Historiales Clínicos de {{ paciente.user_profile.user.first_name }} {{ paciente.user_profile.user.last_name }}</h1>
+      
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Diagnóstico</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for historial in historiales_clinicos %}
+            <tr>
+              <td>{{ historial.fecha }}</td>
+              <td>{{ historial.diagnostico|truncatewords:10 }}</td>
+              <td>
+                <a href="{% url 'historial_detail' historial.pk %}" class="btn btn-info btn-sm">Ver</a>
+                <a href="{% url 'historial_update' historial.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{% url 'historial_delete' historial.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="3">No hay historiales clínicos disponibles para este paciente.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <h1>Este usuario no es un paciente o no tiene historiales clínicos.</h1>
+    {% endif %}
+    
+    <a href="{% url 'user_list' %}" class="btn btn-secondary">Volver a la lista de usuarios</a>
+  </div>
+{% endblock %}

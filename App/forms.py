@@ -303,9 +303,9 @@ class CitaForm(forms.ModelForm):
         fields = ['usuario', 'horario', 'estado']  # Mantén el campo usuario
 
         widgets = {
-            'usuario': forms.Select(attrs={'class': 'form-control'}),
-            'horario': forms.Select(attrs={'class': 'form-control'}),
-            'estado': forms.Select(attrs={'class': 'form-control'}),
+            'usuario': forms.Select(attrs={'placeholder': 'Usuario','class': 'form-control'}),
+            'horario': forms.Select(attrs={'placeholder': 'Horario','class': 'form-control'}),
+            'estado': forms.Select(attrs={'placeholder': 'Estado','class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -319,3 +319,35 @@ class CitaForm(forms.ModelForm):
         else:
             # Si el usuario es admin o secretaria, mostrar todos los usuarios en el campo usuario
             self.fields['usuario'].queryset = User.objects.filter(profile__tipo_usuario='paciente')
+
+
+
+############################FORMULARIO HISTORIAL CLINICO#####################################
+
+from .models import HistorialClinico
+from datetime import date
+
+class HistorialClinicoForm(forms.ModelForm):
+    class Meta:
+        model = HistorialClinico
+        fields = ['paciente', 'fecha', 'diagnostico', 'tratamiento', 'observaciones']
+        widgets = {
+            'paciente': forms.Select(attrs={'placeholder': 'Seleccione el paciente', 'class': 'form-control'}),
+            'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'placeholder': 'Fecha de la consulta'}),
+            'diagnostico': forms.Textarea(attrs={'placeholder': 'Ingrese el diagnóstico', 'class': 'form-control', 'rows': 4}),
+            'tratamiento': forms.Textarea(attrs={'placeholder': 'Describa el tratamiento', 'class': 'form-control', 'rows': 4}),
+            'observaciones': forms.Textarea(attrs={'placeholder': 'Ingrese las observaciones adicionales', 'class': 'form-control', 'rows': 4}),
+        }
+
+    def clean_fecha(self):
+        fecha = self.cleaned_data.get('fecha')
+        if fecha > date.today():
+            raise forms.ValidationError("La fecha no puede estar en el futuro.")
+        return fecha
+
+    def save(self, commit=True):
+        historial_clinico = super().save(commit=False)
+        # Aquí puedes agregar lógica adicional si es necesario antes de guardar el objeto
+        if commit:
+            historial_clinico.save()
+        return historial_clinico
