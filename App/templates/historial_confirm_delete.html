@@ -1,39 +1,14 @@
+<!-- historial_confirm_delete.html -->
+
 {% extends "nav.html" %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if form.instance.pk %}Editar Historial Clínico{% else %}Crear Historial Clínico{% endif %}</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
+
 {% block content %}
-<body>
-    <div class="container mt-5">
-        <h1>{% if form.instance.pk %}Editar Historial Clínico{% else %}Crear Historial Clínico{% endif %}</h1>
-        <form method="post">
-            {% csrf_token %}
-            {% if form.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <p>{{ error }}</p>
-                        {% endfor %}
-                    {% endfor %}
-                    {% for error in form.non_field_errors %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-success">Guardar</button>
-            <a href="{% url 'historial_list' %}" class="btn btn-secondary ml-2">Volver a la lista</a>
-        </form>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+    <h2>¿Estás seguro que quieres eliminar este historial clínico?</h2>
+    <p><strong>Paciente:</strong> {{ object.paciente }}</p>
+    <p><strong>Fecha:</strong> {{ object.fecha }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'historial_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
 {% endblock %}
-</html>

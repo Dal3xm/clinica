@@ -2,9 +2,9 @@
 
 {% block content %}
   <h1>Lista de Horarios</h1>
-  
+  {% if request.user.profile.tipo_usuario == 'administrador' %}
   <a href="{% url 'horario_create' %}" class="btn btn-primary mb-3">Crear Horario</a>
-  
+  {% endif %}
   <table class="table table-striped">
     <thead>
       <tr>
@@ -24,8 +24,10 @@
           <td>{{ horario.disponible|yesno:"Sí,No" }}</td>
           <td>
             <a href="{% url 'horario_detail' horario.pk %}" class="btn btn-info btn-sm">Ver</a>
+            {% if request.user.profile.tipo_usuario == 'administrador' %}
             <a href="{% url 'horario_edit' horario.pk %}" class="btn btn-warning btn-sm">Editar</a>
             <a href="{% url 'horario_delete' horario.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+            {% endif %}
           </td>
         </tr>
       {% empty %}

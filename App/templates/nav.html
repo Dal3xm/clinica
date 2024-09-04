@@ -21,29 +21,32 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}">Inicio</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Citas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Horarios</a>
-                </li>
-                <!-- Mostrar Usuarios solo para Administradores -->
-                {% if request.user.profile.tipo_usuario == 'administrador' %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'user_list' %}">Usuarios</a>
-                </li>
-                {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'edit_user_profile' %}">Perfil</a>
-                </li>
                 {% if request.user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'exit' %}">Salir</a>
-                </li>
+                    {% if request.user.profile.tipo_usuario == 'paciente' or request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'secretaria' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cita_list' %}">Citas</a>
+                    </li>
+                    {% endif %}
+                    {% if request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'administrador' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'horario_list' %}">Horarios</a>
+                    </li>
+                    {% endif %}
+                    {% if request.user.profile.tipo_usuario == 'administrador' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_list' %}">Usuarios</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_profile_detail' %}">Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'exit' %}">Salir</a>
+                    </li>
                 {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Iniciar</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar</a>
+                    </li>
                 {% endif %}
             </ul>
         </div>
@@ -59,17 +62,20 @@
                             <span class="fs-5">Menú</span>
                         </a>
                         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+                            {% if request.user.profile.tipo_usuario == 'paciente' or request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'secretaria' or request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'administrador'%}
                             <li>
                                 <a href="{% url 'cita_list' %}" class="nav-link text-white">
                                     <i class="fas fa-calendar-alt"></i> Citas
                                 </a>
                             </li>
+                            {% endif %}
+                            {% if request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'administrador' %}
                             <li>
                                 <a href="{% url 'horario_list' %}" class="nav-link text-white">
                                     <i class="fas fa-clock"></i> Horarios
                                 </a>
                             </li>
-                            <!-- Mostrar Usuarios solo para Administradores -->
+                            {% endif %}
                             {% if request.user.profile.tipo_usuario == 'administrador' %}
                             <li>
                                 <a href="{% url 'user_list' %}" class="nav-link text-white">
@@ -77,16 +83,14 @@
                                 </a>
                             </li>
                             {% endif %}
-                            <li>
-                                <a href="{% url 'user_profile_detail' %}" class="nav-link text-white">
-                                    <i class="fas fa-user"></i> Perfil
-                                </a>
-                            </li>
+
+                            {% if request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'paciente' %}
                             <li>
                                 <a href="{% url 'historial_list' %}" class="nav-link text-white">
-                                    <i class="fas fa-user"></i> Historiales
+                                    <i class="fas fa-folder-medical"></i> Historiales
                                 </a>
                             </li>
+                            {% endif %}
                         </ul>
                         <hr>
                     </div>

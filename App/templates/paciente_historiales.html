@@ -20,7 +20,9 @@
               <td>{{ historial.diagnostico|truncatewords:10 }}</td>
               <td>
                 <a href="{% url 'historial_detail' historial.pk %}" class="btn btn-info btn-sm">Ver</a>
+                {% if request.user.profile.tipo_usuario == 'medico'%}
                 <a href="{% url 'historial_update' historial.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                {% endif %}
                 <a href="{% url 'historial_delete' historial.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
               </td>
             </tr>

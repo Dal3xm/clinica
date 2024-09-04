@@ -1,23 +1,16 @@
 {% extends "nav.html" %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1>Lista de Historiales Clínicos</h1>
-        
-        <ul class="list-group mt-4">
-            {% for historial in historiales_clinicos %}
-                <li class="list-group-item">
-                    <a href="{% url 'historial_detail' historial.pk %}">
-                        <strong>Historial de {{ historial.paciente }}</strong> - {{ historial.fecha }}
-                    </a>
-                </li>
-            {% empty %}
-                <li class="list-group-item">No hay historiales clínicos disponibles.</li>
-            {% endfor %}
-        </ul>
-        
-        <div class="mt-4">
-            <a href="{% url 'historial_create' %}" class="btn btn-primary">Crear nuevo historial clínico</a>
-        </div>
-    </div>
+  <h1>Detalles del Horario</h1>
+  
+  <ul class="list-group">
+    <li class="list-group-item"><strong>Médico:</strong> {{ horario.medico }}</li>
+    <li class="list-group-item"><strong>Día:</strong> {{ horario.dia }}</li>
+    <li class="list-group-item"><strong>Horario:</strong> {{ horario.get_horario_display }}</li>
+    <li class="list-group-item"><strong>Disponible:</strong> {{ horario.disponible|yesno:"Sí,No" }}</li>
+  </ul>
+
+  <a href="{% url 'horario_edit' horario.pk %}" class="btn btn-warning mt-3">Editar</a>
+  <a href="{% url 'horario_delete' horario.pk %}" class="btn btn-danger mt-3">Eliminar</a>
+  <a href="{% url 'horario_list' %}" class="btn btn-secondary mt-3">Volver a la lista de horarios</a>
 {% endblock %}

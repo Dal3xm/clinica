@@ -1,0 +1,13 @@
+{% extends "nav.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h3>Perfil de Paciente</h3>
+    <p><strong>DPI:</strong> {{ profile_data.dpi }}</p>
+    <p><strong>Fecha de Nacimiento:</strong> {{ profile_data.fecha_nacimiento }}</p>
+    <p><strong>Dirección:</strong> {{ profile_data.direccion }}</p>
+    <p><strong>Teléfono:</strong> {{ profile_data.telefono }}</p>
+    <p><strong>Seguro Médico:</strong> {{ profile_data.seguro_medico }}</p>
+    <p><strong>Tipo de Sangre:</strong> {{ profile_data.blood_type }}</p>
+    <p><strong>Padecimientos:</strong> {{ profile_data.conditions }}</p>
+</div>
+{% endblock %}
