@@ -11,10 +11,14 @@ from .models import UserProfile, Paciente, Medico, Secretaria, Horario
 
 ######################formulario registro para pacientes############################
 
+import re
+from django.core.exceptions import ValidationError
+
 class PatientSignUpForm(forms.ModelForm):
     password1 = forms.CharField(
         label='Contraseña',
-        widget=forms.PasswordInput(attrs={'placeholder': 'Ingresa tu contraseña', 'class': 'form-control'})
+        widget=forms.PasswordInput(attrs={'placeholder': 'Ingresa tu contraseña', 'class': 'form-control'}),
+        min_length=8,  # Se asegura de que la longitud mínima sea de 8 caracteres
     )
     password2 = forms.CharField(
         label='Confirmar Contraseña',
@@ -31,12 +35,46 @@ class PatientSignUpForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'placeholder': 'Tu correo electrónico', 'class': 'form-control'}),
         }
 
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get("first_name")
+        if not re.match(r'^[A-Za-z]+$', first_name):  # Solo letras (mayúsculas y minúsculas)
+            raise forms.ValidationError("El nombre solo puede contener letras.")
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get("last_name")
+        if not re.match(r'^[A-Za-z]+$', last_name):  # Solo letras (mayúsculas y minúsculas)
+            raise forms.ValidationError("El apellido solo puede contener letras.")
+        return last_name
+
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
+
+        # Verificar si las contraseñas coinciden
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Las contraseñas no coinciden.")
+
+        # Validar que la contraseña cumpla con los requisitos de seguridad
+        if not self.is_valid_password(password1):
+            raise forms.ValidationError("La contraseña debe tener al menos 8 caracteres, incluir números y al menos una letra.")
+
         return password2
+
+    def is_valid_password(self, password):
+        """
+        Verifica si la contraseña cumple con los requisitos:
+        - Al menos 8 caracteres.
+        - Contiene al menos un número.
+        - Contiene al menos una letra.
+        """
+        if len(password) < 8:
+            return False
+        if not re.search(r'\d', password):  # Verifica que contenga al menos un número
+            return False
+        if not re.search(r'[A-Za-z]', password):  # Verifica que contenga al menos una letra
+            return False
+        return True
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -46,21 +84,24 @@ class PatientSignUpForm(forms.ModelForm):
         return user
 
 
-
 #############formulario de usuarios############################
+
+import re
+from django.core.exceptions import ValidationError
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(
-        label='Contraseña', 
-        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña', 'class': 'form-control'})
+        label='Contraseña',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña', 'class': 'form-control'}),
+        min_length=8,  # Se asegura de que la longitud mínima sea de 8 caracteres
     )
     password2 = forms.CharField(
-        label='Confirmar Contraseña', 
+        label='Confirmar Contraseña',
         widget=forms.PasswordInput(attrs={'placeholder': 'Confirmar Contraseña', 'class': 'form-control'})
     )
     tipo_usuario = forms.ChoiceField(
-        choices=UserProfile.TIPO_USUARIO_CHOICES, 
-        label="Tipo de usuario", 
+        choices=UserProfile.TIPO_USUARIO_CHOICES,
+        label="Tipo de usuario",
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
@@ -74,24 +115,60 @@ class UserCreationForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'placeholder': 'Correo electrónico', 'class': 'form-control'}),
         }
 
+    # Validación de que los nombres y apellidos solo contengan letras
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get("first_name")
+        if not re.match(r'^[A-Za-z]+$', first_name):  # Solo letras (mayúsculas y minúsculas)
+            raise ValidationError("El nombre solo puede contener letras.")
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get("last_name")
+        if not re.match(r'^[A-Za-z]+$', last_name):  # Solo letras (mayúsculas y minúsculas)
+            raise ValidationError("El apellido solo puede contener letras.")
+        return last_name
+
+    # Validación de contraseñas
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
+        
+        # Verificar si las contraseñas coinciden
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Las contraseñas no coinciden.")
+            raise ValidationError("Las contraseñas no coinciden.")
+
+        # Validar que la contraseña cumpla con los requisitos de seguridad
+        if not self.is_valid_password(password1):
+            raise ValidationError("La contraseña debe tener al menos 8 caracteres, incluir números y al menos una letra.")
+
         return password2
+
+    def is_valid_password(self, password):
+        """
+        Verifica si la contraseña cumple con los requisitos:
+        - Al menos 8 caracteres.
+        - Contiene al menos un número.
+        - Contiene al menos una letra.
+        """
+        if len(password) < 8:
+            return False
+        if not re.search(r'\d', password):  # Verifica que contenga al menos un número
+            return False
+        if not re.search(r'[A-Za-z]', password):  # Verifica que contenga al menos una letra
+            return False
+        return True
 
     def save(self, commit=True):
         # Guardar el usuario
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
-        
+
         if commit:
             user.save()
             # Crear o actualizar el perfil del usuario
             tipo_usuario = self.cleaned_data['tipo_usuario']
             user_profile, created = UserProfile.objects.update_or_create(
-                user=user, 
+                user=user,
                 defaults={'tipo_usuario': tipo_usuario}
             )
 

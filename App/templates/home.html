@@ -1,15 +1,97 @@
 {% extends 'nav.html' %}
 
 {% block content %}
-<h1>Inicio</h1>
-
-{% if request.user.is_authenticated %}
-    <h4>{{user.username | upper}}, Hola</h4>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="display-4">Bienvenido a la Clínica Matazano</h1>
+            <p class="lead">Atención de alta calidad en múltiples especialidades médicas.</p>
+        </div>
+    </div>
     
-{% else %}
+    {% if request.user.is_authenticated %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-success text-center">
+                <h4 class="alert-heading">Hola {{ user.username | upper }}, ¡bienvenido de nuevo!</h4>
+                <p>Esperamos que encuentres todo lo que necesitas para tu bienestar.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="row mt-5">
+        <!-- Card: Especialidades -->
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-stethoscope fa-3x mb-3"></i>
+                    <h5 class="card-title">Consulta Médica</h5>
+                    <p class="card-text">Consulta con nuestros especialistas en diversas áreas médicas.</p>
+                    <a href="#" class="btn btn-primary">Ver Especialidades</a>
+                </div>
+            </div>
+        </div>
+        <!-- Card: Citas -->
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-calendar-check fa-3x mb-3"></i>
+                    <h5 class="card-title">Agenda tu Cita</h5>
+                    <p class="card-text">Organiza tu visita de forma rápida y fácil.</p>
+                    <a href="{% url 'cita_list' %}" class="btn btn-primary">Agendar</a>
+                </div>
+            </div>
+        </div>
+        <!-- Card: Historiales -->
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-folder-medical fa-3x mb-3"></i>
+                    <h5 class="card-title">Historial Médico</h5>
+                    <p class="card-text">Accede a tu historial de visitas y tratamientos.</p>
+                    <a href="{% url 'historial_list' %}" class="btn btn-primary">Ver Historial</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-{% endif %}
-
-
-
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <h2 class="mb-4">Nuestras Especialidades</h2>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-heartbeat fa-2x mb-3"></i>
+                    <h6>Cardiología</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-brain fa-2x mb-3"></i>
+                    <h6>Neurología</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-x-ray fa-2x mb-3"></i>
+                    <h6>Radiología</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-pills fa-2x mb-3"></i>
+                    <h6>Farmacología</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
