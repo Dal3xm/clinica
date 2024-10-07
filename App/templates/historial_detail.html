@@ -1,15 +1,37 @@
-<!-- historial_detail.html -->
-
 {% extends "nav.html" %}
 
 {% block content %}
-    <h2>Historial Clínico de {{ historial_clinico.paciente }}</h2>
-    <p><strong>Fecha:</strong> {{ historial_clinico.fecha }}</p>
-    <p><strong>Diagnóstico:</strong> {{ historial_clinico.diagnostico }}</p>
-    <p><strong>Tratamiento:</strong> {{ historial_clinico.tratamiento }}</p>
-    <p><strong>Observaciones:</strong> {{ historial_clinico.observaciones }}</p>
+<div class="container mt-5">
+    <h2 class="mb-4">Historial Clínico de {{ historial_clinico.paciente.user_profile.user.first_name }} {{ historial_clinico.paciente.user_profile.user.last_name }}</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Detalles del Historial Clínico</h5>
+            <p class="card-text"><strong>Fecha:</strong> {{ historial_clinico.fecha }}</p>
+            <p class="card-text"><strong>Diagnóstico:</strong> {{ historial_clinico.diagnostico }}</p>
+            <p class="card-text"><strong>Tratamiento:</strong> {{ historial_clinico.tratamiento }}</p>
+            <p class="card-text"><strong>Observaciones:</strong> 
+                {% if historial_clinico.observaciones %}
+                    {{ historial_clinico.observaciones }}
+                {% else %}
+                    <em>No hay observaciones adicionales</em>
+                {% endif %}
+            </p>
+        </div>
+    </div>
 
-    <a href="{% url 'historial_update' historial_clinico.pk %}">Editar</a> |
-    <a href="{% url 'historial_delete' historial_clinico.pk %}">Eliminar</a> |
-    <a href="{% url 'historial_list' %}">Volver a la lista</a>
+    <div class="mt-4">
+        <!-- Mostrar botón de Editar solo si el usuario es un médico -->
+        {% if request.user.profile.tipo_usuario == 'medico' %}
+            <a href="{% url 'historial_update' historial_clinico.pk %}" class="btn btn-warning">Editar</a>
+        {% endif %}
+        
+        <!-- Mostrar botón de Eliminar solo si el usuario es administrador o secretaria -->
+        {% if request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'secretaria' %}
+            <a href="{% url 'historial_delete' historial_clinico.pk %}" class="btn btn-danger">Eliminar</a>
+        {% endif %}
+        
+        <a href="{% url 'historial_list' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
 {% endblock %}

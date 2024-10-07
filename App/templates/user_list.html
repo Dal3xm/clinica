@@ -13,24 +13,45 @@
 <body>
     <div class="container mt-5">
         <h1>Lista de Usuarios</h1>
+        
+        <!-- Filtro de usuarios por tipo -->
+        <form method="get" class="form-inline mb-3">
+            <div class="form-group mr-3">
+                <label for="tipo_usuario" class="mr-2">Filtrar por tipo de usuario:</label>
+                <select name="tipo_usuario" id="tipo_usuario" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="paciente" {% if selected_filter == 'paciente' %}selected{% endif %}>Pacientes</option>
+                    <option value="medico" {% if selected_filter == 'medico' %}selected{% endif %}>Médicos</option>
+                    <option value="administrador" {% if selected_filter == 'administrador' %}selected{% endif %}>Administradores</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Aplicar Filtro</button>
+        </form>
+        
         <a href="{% url 'user_create' %}" class="btn btn-primary mb-3">Crear Usuario</a>
+        
         <ul class="list-group">
             {% for user in users %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         {{ user.username }} - {{ user.first_name }} {{ user.last_name }} - {{ user.email }} - 
-                        {{ user.userprofile.get_tipo_usuario_display }}
+                        {{ user.profile.get_tipo_usuario_display }}
                     </div>
                     <div>
-                        <a href="{% url 'paciente_historiales' user.pk %}" class="btn btn-sm btn-success">Ver Historiales Clínicos</a>
+                        {% if user.profile.tipo_usuario == 'paciente' %}
+                            <a href="{% url 'paciente_historiales' user.pk %}" class="btn btn-sm btn-success">Ver Historiales Clínicos</a>
+                        {% endif %}
                         <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning">Editar Usuario</a>
                         <a href="{% url 'user_profile_edit' user.pk %}" class="btn btn-sm btn-info">Editar Perfil</a>
                         <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
                     </div>
                 </li>
+            {% empty %}
+                <li class="list-group-item text-center">No hay usuarios disponibles.</li>
             {% endfor %}
         </ul>
     </div>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

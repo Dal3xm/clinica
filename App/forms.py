@@ -8,7 +8,10 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import UserProfile, Paciente, Medico, Secretaria, Horario
 
-
+from django import forms
+from django.utils import timezone
+from .models import Cita, Horario
+from django.contrib.auth.models import User
 ######################formulario registro para pacientes############################
 
 import re
@@ -371,31 +374,59 @@ class HorarioForm(forms.ModelForm):
 
 #formulario citas
 
+
+
 from django import forms
-from .models import Cita
+from django.utils import timezone
+from .models import Cita, Horario
+from django.contrib.auth.models import User
+
+from django import forms
+from django.utils import timezone
+from .models import Cita, Horario
+from django.contrib.auth.models import User
 
 class CitaForm(forms.ModelForm):
     class Meta:
         model = Cita
-        fields = ['usuario', 'horario', 'estado']  # Mantén el campo usuario
+        fields = ['usuario', 'horario', 'estado']
 
         widgets = {
-            'usuario': forms.Select(attrs={'placeholder': 'Usuario','class': 'form-control'}),
-            'horario': forms.Select(attrs={'placeholder': 'Horario','class': 'form-control'}),
-            'estado': forms.Select(attrs={'placeholder': 'Estado','class': 'form-control'}),
+            'usuario': forms.Select(attrs={'placeholder': 'Usuario', 'class': 'form-control'}),
+            'horario': forms.Select(attrs={'placeholder': 'Horario', 'class': 'form-control'}),
+            'estado': forms.Select(attrs={'placeholder': 'Estado', 'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Recibir el usuario actual desde la vista
         super(CitaForm, self).__init__(*args, **kwargs)
 
+        # Filtrar los horarios que ya están ocupados y solo mostrar los disponibles en fechas futuras
+        horarios_ocupados = Cita.objects.values_list('horario_id', flat=True)
+        self.fields['horario'].queryset = Horario.objects.filter(
+            dia__gte=timezone.now().date(), disponible=True
+        ).exclude(id__in=horarios_ocupados)
+
         if user and user.profile.tipo_usuario == 'paciente':
-            # Si el usuario es paciente, ocultar el campo usuario
+            # Si el usuario es paciente, ocultar el campo usuario y estado
             self.fields.pop('usuario')
             self.fields.pop('estado')
         else:
             # Si el usuario es admin o secretaria, mostrar todos los usuarios en el campo usuario
             self.fields['usuario'].queryset = User.objects.filter(profile__tipo_usuario='paciente')
+
+    def clean_horario(self):
+        horario = self.cleaned_data.get('horario')
+
+        # Validar que el horario no esté en una fecha pasada
+        if horario.dia < timezone.now().date():
+            raise forms.ValidationError("No puedes seleccionar un horario en una fecha pasada.")
+
+        # Validar que no exista ya una cita para ese horario
+        if Cita.objects.filter(horario=horario).exists():
+            raise forms.ValidationError("Este horario ya está reservado. Por favor, selecciona otro.")
+        
+        return horario
 
 
 

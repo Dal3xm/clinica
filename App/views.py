@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from .forms import UserCreationForm, UserUpdateForm, PacienteForm, MedicoForm, SecretariaForm, HistorialClinicoForm, UserSelfUpdateForm, MedicoFormSelf, PatientSignUpForm
 from .models import Paciente, Medico, Secretaria, Cita, HistorialClinico, UserProfile
@@ -27,20 +27,29 @@ class PatientSignUpView(CreateView):
 
 
 # Lista de usuarios (solo para administradores)
-class UserListView(UserPassesTestMixin, ListView):
+class UserListView(ListView):
     model = User
     template_name = 'user_list.html'
     context_object_name = 'users'
 
     def get_queryset(self):
-        return User.objects.filter(is_superuser=False)
+        # Obtener el tipo de usuario del filtro de la URL
+        tipo_usuario = self.request.GET.get('tipo_usuario')
 
-    def test_func(self):
-        return self.request.user.profile.tipo_usuario == 'administrador'
+        # Filtrar solo los usuarios que no son superusuarios
+        queryset = User.objects.filter(is_superuser=False)
 
-    def handle_no_permission(self):
-        return redirect('home')
+        if tipo_usuario:
+            # Filtrar por el tipo de usuario si se proporciona un filtro
+            queryset = queryset.filter(profile__tipo_usuario=tipo_usuario)
 
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pasar el valor actual del filtro al contexto para mantener el filtro en el template
+        context['selected_filter'] = self.request.GET.get('tipo_usuario', '')
+        return context
 
 # Crear usuario (solo para administradores)
 class UserCreateView(UserPassesTestMixin, CreateView):
@@ -463,6 +472,7 @@ class CitaDetailView(LoginRequiredMixin, DetailView):
 
 
 # Listar las citas del usuario autenticado (todos los roles)
+from django.utils import timezone
 class CitaListView(LoginRequiredMixin, ListView):
     model = Cita
     template_name = 'cita_list.html'
@@ -470,12 +480,16 @@ class CitaListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         user_profile = self.request.user.profile
+        today = timezone.now().date()
+
+        # Filtrar citas basadas en el tipo de usuario
         if user_profile.tipo_usuario in ['administrador', 'secretaria']:
-            return Cita.objects.all()
+            return Cita.objects.filter(horario__dia__gte=today)
         elif user_profile.tipo_usuario == 'paciente':
-            return Cita.objects.filter(usuario=self.request.user)
+            return Cita.objects.filter(usuario=self.request.user, horario__dia__gte=today)
         elif user_profile.tipo_usuario == 'medico':
-            return Cita.objects.filter(horario__medico=user_profile.medico_profile)
+            return Cita.objects.filter(horario__medico=user_profile.medico_profile, horario__dia__gte=today)
+        
         return Cita.objects.none()
 
 
