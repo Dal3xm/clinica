@@ -37,12 +37,8 @@
                             <div class="horarios-container">
                                 {% for horario in form.horarios %}
                                     <label class="horario-slot">
-                                        <input type="checkbox" name="{{ horario.name }}" value="{{ horario.choice_value }}" 
-                                            {% if horario.choice_value in horarios_existentes %}disabled{% endif %}>
+                                        {{ horario.tag }}
                                         <span>{{ horario.choice_label }}</span>
-                                        {% if horario.choice_value in horarios_existentes %}
-                                            <span class="text-danger">(Ocupado)</span>
-                                        {% endif %}
                                     </label>
                                 {% endfor %}
                             </div>
@@ -88,54 +84,54 @@
     }
 
     .horario-slot input[type="checkbox"] {
-        width: 20px !important;
-        height: 20px !important;
-        visibility: visible !important;
-        margin-right: 10px;
-    }
+    width: 20px !important;  /* Ajusta el tamaño del checkbox */
+    height: 20px !important; /* Ajusta el tamaño del checkbox */
+    visibility: visible !important; /* Asegura que el checkbox sea visible */
+    margin-right: 10px; /* Espacio entre el checkbox y el texto */
+}
 
-    .horario-slot {
-        display: inline-block;
-        width: 120px;
-        height: 70px;
-        margin: 20px;
-        padding: 15px;
-        text-align: center;
-        border: 2px solid #ced4da;
-        border-radius: 10px;
-        cursor: pointer;
-        background-color: white;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        font-size: 14px;
-        font-weight: bold;
-    }
+.horario-slot {
+    display: inline-block;
+    width: 110px;
+    height: 70px;
+    margin: 10px;
+    padding: 15px;
+    text-align: center;
+    border: 2px solid #ced4da;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: white;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 14px;
+    font-weight: bold;
+}
 
-    .horario-slot:hover {
-        background-color: #e3f2fd;
-        box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
-    }
+.horario-slot:hover {
+    background-color: #e3f2fd;
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
 
-    .horario-slot input[type="checkbox"]:checked + span {
-        background-color: #007bff;
-        color: white;
-        padding: 8px;
-        border-radius: 8px;
-    }
+.horario-slot input[type="checkbox"]:checked + span {
+    background-color: #007bff;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+}
 
-    .progress {
-        height: 20px;
-        border-radius: 10px;
-    }
+.progress {
+    height: 20px;
+    border-radius: 10px;
+}
 
-    .progress-bar {
-        background-color: #007bff;
-    }
+.progress-bar {
+    background-color: #007bff;
+}
 
-    label {
-        font-weight: bold;
-    }
+label {
+    font-weight: bold;
+}
 
-    button.btn-lg {
-        font-size: 18px;
-    }
+button.btn-lg {
+    font-size: 18px;
+}
 </style>

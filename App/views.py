@@ -368,11 +368,11 @@ class HorarioListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 ########################crear horarios############################
 
-from django.shortcuts import redirect, render
+# Crear un nuevo horario (solo administradores)
+from django.shortcuts import redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-from django.contrib.auth.mixins import UserPassesTestMixin
 from .models import Horario
 from .forms import HorarioMultipleForm
 
@@ -380,21 +380,6 @@ class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
     form_class = HorarioMultipleForm
     template_name = 'horario_form.html'
     success_url = reverse_lazy('horario_list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        medico = self.request.GET.get('medico')
-        dia = self.request.GET.get('dia')
-        
-        # Si el médico y la fecha están seleccionados, obtenemos los horarios ya existentes
-        if medico and dia:
-            horarios_existentes = Horario.objects.filter(medico=medico, dia=dia).values_list('horario', flat=True)
-            context['horarios_existentes'] = list(horarios_existentes)  # Pasamos los horarios como una lista
-        else:
-            context['horarios_existentes'] = []
-
-        return context
 
     def form_valid(self, form):
         medico = form.cleaned_data['medico']
@@ -414,7 +399,6 @@ class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
 
     def handle_no_permission(self):
         return redirect('home')
-
 
 
 
