@@ -7,7 +7,9 @@
             <!-- Encabezado del formulario -->
             <div class="card shadow-sm mb-5">
                 <div class="card-body">
-                    <h1 class="mb-4 text-center text-primary">{% if object %}Editar Horario{% else %}Crear Horarios{% endif %}</h1>
+                    <h1 class="mb-4 text-center text-primary">
+                        {% if object %}Editar Horario{% else %}Crear Horarios{% endif %}
+                    </h1>
 
                     <!-- Formulario -->
                     <form method="post">
@@ -52,7 +54,8 @@
                         <!-- Botones de acción -->
                         <div class="mt-4 text-center">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-plus-circle"></i> {% if object %}Actualizar{% else %}Crear Horarios{% endif %}
+                                <i class="fas fa-plus-circle"></i> 
+                                {% if object %}Actualizar{% else %}Crear Horarios{% endif %}
                             </button>
                             <a href="{% url 'horario_list' %}" class="btn btn-secondary btn-lg ml-3">
                                 <i class="fas fa-arrow-left"></i> Volver a la lista

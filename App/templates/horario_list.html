@@ -30,27 +30,36 @@
                         </div>
                     </form>
 
+                    {% if all_horarios %}
                     <!-- Horarios disponibles en estilo visual -->
-                    <div class="horarios-container mt-4">
-                        {% for horario_key, horario_label in all_horarios %}
-                            {% if horario_key in horarios_filtrados %}
-                            <label class="horario-slot horario-no-disponible">
-                                <input type="checkbox" disabled checked>
-                                <span>{{ horario_label }}</span>
-                            </label>
-                            {% else %}
-                            <label class="horario-slot">
-                                <input type="checkbox" disabled>
-                                <span>{{ horario_label }}</span>
-                            </label>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                                            <!-- Barra de progreso estática (sin funcionalidad) -->
-                                            <div class="progress mt-4">
-                                              <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                          </div>
-                  
+                    <form method="post" action="{% url 'horario_create' %}">
+                        {% csrf_token %}
+                        <div class="horarios-container mt-4">
+                            {% for horario_key, horario_label in all_horarios %}
+                                {% if horario_key in horarios_filtrados %}
+                                <label class="horario-slot horario-no-disponible">
+                                    <input type="checkbox" disabled checked>
+                                    <span>{{ horario_label }}</span>
+                                </label>
+                                {% else %}
+                                <label class="horario-slot">
+                                    <input type="checkbox" name="horarios" value="{{ horario_key }}">
+                                    <span>{{ horario_label }}</span>
+                                </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Botón para registrar nuevos horarios -->
+                        <div class="text-center mt-4">
+                            <input type="hidden" name="medico" value="{{ medico_id }}">
+                            <input type="hidden" name="dia" value="{{ dia }}">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Registrar nuevos horarios
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -110,15 +119,6 @@
     border-radius: 8px;
 }
 
-.progress {
-    height: 20px;
-    border-radius: 10px;
-}
-
-.progress-bar {
-    background-color: #007bff;
-}
-
 label {
     font-weight: bold;
 }
@@ -127,4 +127,3 @@ button.btn-lg {
     font-size: 18px;
 }
 </style>
-

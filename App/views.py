@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
-from .forms import UserCreationForm, UserUpdateForm, PacienteForm, MedicoForm, SecretariaForm, HistorialClinicoForm, UserSelfUpdateForm, MedicoFormSelf, PatientSignUpForm
+from .forms import HorarioFilterForm, UserCreationForm, UserUpdateForm, PacienteForm, MedicoForm, SecretariaForm, HistorialClinicoForm, UserSelfUpdateForm, MedicoFormSelf, PatientSignUpForm
 from .models import Paciente, Medico, Secretaria, Cita, HistorialClinico, UserProfile
 from django.shortcuts import get_object_or_404
 
@@ -327,11 +327,6 @@ from django.views.generic import ListView
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-# Formulario de filtro para seleccionar médico y fecha
-class HorarioFilterForm(forms.Form):
-    medico = forms.ModelChoiceField(queryset=Medico.objects.all(), required=True, label="Médico", widget=forms.Select(attrs={'class': 'form-control'}))
-    dia = forms.DateField(required=True, label="Día", widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
-
 class HorarioListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Horario
     template_name = 'horario_list.html'
@@ -350,12 +345,19 @@ class HorarioListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['form'] = HorarioFilterForm(self.request.GET or None)
 
-        # Obtener todos los horarios posibles y los filtrados
-        horarios_filtrados = self.get_queryset()
-        horarios_dict = {horario.horario: horario for horario in horarios_filtrados}
-        
-        context['all_horarios'] = Horario.HORARIOS  # Todos los horarios posibles
-        context['horarios_filtrados'] = horarios_dict  # Diccionario de horarios ya ocupados por clave
+        medico_id = self.request.GET.get('medico')
+        dia = self.request.GET.get('dia')
+
+        if medico_id and dia:
+            # Si se ha enviado el filtro, obtener los horarios ocupados
+            horarios_filtrados = self.get_queryset()
+            horarios_dict = {horario.horario: horario for horario in horarios_filtrados}
+
+            context['all_horarios'] = Horario.HORARIOS  # Todos los horarios posibles
+            context['horarios_filtrados'] = horarios_dict  # Diccionario de horarios ya ocupados por clave
+            context['medico_id'] = medico_id  # Para utilizar en el formulario de crear horarios
+            context['dia'] = dia  # Para el formulario de crear horarios
+
         return context
 
     def test_func(self):
@@ -363,6 +365,7 @@ class HorarioListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
     def handle_no_permission(self):
         return redirect('home')
+
 
 
 
@@ -381,17 +384,23 @@ class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
     template_name = 'horario_form.html'
     success_url = reverse_lazy('horario_list')
 
-    def form_valid(self, form):
-        medico = form.cleaned_data['medico']
-        dia = form.cleaned_data['dia']
-        horarios_seleccionados = form.cleaned_data['horarios']
-        
-        # Crear un registro por cada horario seleccionado, si no existe ya
-        for horario in horarios_seleccionados:
-            if not Horario.objects.filter(medico=medico, dia=dia, horario=horario).exists():
-                Horario.objects.create(medico=medico, dia=dia, horario=horario, disponible=True)
-        
-        messages.success(self.request, f'Se han creado {len(horarios_seleccionados)} horarios para el médico {medico}.')
+    def post(self, request, *args, **kwargs):
+        medico_id = request.POST.get('medico')
+        dia = request.POST.get('dia')
+        horarios_seleccionados = request.POST.getlist('horarios')
+
+        if medico_id and dia and horarios_seleccionados:
+            medico = Medico.objects.get(id=medico_id)
+
+            # Crear un registro por cada horario seleccionado, si no existe ya
+            for horario in horarios_seleccionados:
+                if not Horario.objects.filter(medico=medico, dia=dia, horario=horario).exists():
+                    Horario.objects.create(medico=medico, dia=dia, horario=horario, disponible=True)
+
+            messages.success(self.request, f'Se han creado {len(horarios_seleccionados)} horarios para el médico {medico}.')
+        else:
+            messages.error(self.request, 'Faltan datos para crear los horarios.')
+
         return redirect(self.success_url)
 
     def test_func(self):

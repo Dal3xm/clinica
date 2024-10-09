@@ -380,6 +380,13 @@ class HorarioMultipleForm(forms.ModelForm):
 #formulario citas
 
 
+from django import forms
+from .models import Medico
+
+class HorarioFilterForm(forms.Form):
+    medico = forms.ModelChoiceField(queryset=Medico.objects.all(), required=True, label="Médico", widget=forms.Select(attrs={'class': 'form-control'}))
+    dia = forms.DateField(required=True, label="Día", widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+
 
 from django import forms
 from django.utils import timezone
