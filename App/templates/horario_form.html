@@ -1,13 +1,141 @@
 {% extends "nav.html" %}
 
 {% block content %}
-  <h1>{% if object %}Editar Horario{% else %}Crear Horario{% endif %}</h1>
-  
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">{% if object %}Actualizar{% else %}Crear{% endif %}</button>
-  </form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Encabezado del formulario -->
+            <div class="card shadow-sm mb-5">
+                <div class="card-body">
+                    <h1 class="mb-4 text-center text-primary">{% if object %}Editar Horario{% else %}Crear Horarios{% endif %}</h1>
 
-  <a href="{% url 'horario_list' %}" class="btn btn-secondary mt-3">Volver a la lista de horarios</a>
+                    <!-- Formulario -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Campo del Médico -->
+                        <div class="form-group">
+                            <label for="id_medico">
+                                <i class="fas fa-user-md text-info"></i> Médico
+                            </label>
+                            {{ form.medico }}
+                        </div>
+
+                        <!-- Campo de la Fecha -->
+                        <div class="form-group">
+                            <label for="id_dia">
+                                <i class="far fa-calendar-alt text-info"></i> Día
+                            </label>
+                            {{ form.dia }}
+                        </div>
+
+                        <!-- Campo de Horarios -->
+                        <div class="form-group">
+                            <label for="id_horarios">
+                                <i class="far fa-clock text-info"></i> Horarios Disponibles
+                            </label>
+                            <div class="horarios-container">
+                                {% for horario in form.horarios %}
+                                    <label class="horario-slot">
+                                        <input type="checkbox" name="{{ horario.name }}" value="{{ horario.choice_value }}" 
+                                            {% if horario.choice_value in horarios_existentes %}disabled{% endif %}>
+                                        <span>{{ horario.choice_label }}</span>
+                                        {% if horario.choice_value in horarios_existentes %}
+                                            <span class="text-danger">(Ocupado)</span>
+                                        {% endif %}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Barra de progreso estática (sin funcionalidad) -->
+                        <div class="progress mt-4">
+                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus-circle"></i> {% if object %}Actualizar{% else %}Crear Horarios{% endif %}
+                            </button>
+                            <a href="{% url 'horario_list' %}" class="btn btn-secondary btn-lg ml-3">
+                                <i class="fas fa-arrow-left"></i> Volver a la lista
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+<!-- Estilos personalizados -->
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+
+    .horarios-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .horario-slot input[type="checkbox"] {
+        width: 20px !important;
+        height: 20px !important;
+        visibility: visible !important;
+        margin-right: 10px;
+    }
+
+    .horario-slot {
+        display: inline-block;
+        width: 120px;
+        height: 70px;
+        margin: 20px;
+        padding: 15px;
+        text-align: center;
+        border: 2px solid #ced4da;
+        border-radius: 10px;
+        cursor: pointer;
+        background-color: white;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .horario-slot:hover {
+        background-color: #e3f2fd;
+        box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+    }
+
+    .horario-slot input[type="checkbox"]:checked + span {
+        background-color: #007bff;
+        color: white;
+        padding: 8px;
+        border-radius: 8px;
+    }
+
+    .progress {
+        height: 20px;
+        border-radius: 10px;
+    }
+
+    .progress-bar {
+        background-color: #007bff;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    button.btn-lg {
+        font-size: 18px;
+    }
+</style>

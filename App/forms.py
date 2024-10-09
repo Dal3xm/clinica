@@ -360,15 +360,20 @@ class UserSelfUpdateForm(forms.ModelForm):
 from django import forms
 from .models import Horario
 
-class HorarioForm(forms.ModelForm):
+class HorarioMultipleForm(forms.ModelForm):
+    # Campo de selección múltiple para los horarios
+    horarios = forms.MultipleChoiceField(
+        choices=Horario.HORARIOS,
+        widget=forms.CheckboxSelectMultiple()  # Elimina 'form-control'
+    )
+
     class Meta:
         model = Horario
-        fields = ['medico', 'dia', 'horario']
+        fields = ['medico', 'dia']  # Eliminamos 'horario' del Meta porque ahora se selecciona en 'horarios'
         
         widgets = {
             'medico': forms.Select(attrs={'class': 'form-control'}),
             'dia': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'horario': forms.Select(attrs={'class': 'form-control'}),
         }
 
 

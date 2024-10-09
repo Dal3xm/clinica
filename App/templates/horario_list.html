@@ -1,40 +1,130 @@
 {% extends "nav.html" %}
 
 {% block content %}
-  <h1>Lista de Horarios</h1>
-  {% if request.user.profile.tipo_usuario == 'administrador' %}
-  <a href="{% url 'horario_create' %}" class="btn btn-primary mb-3">Crear Horario</a>
-  {% endif %}
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Médico</th>
-        <th>Día</th>
-        <th>Horario</th>
-        <th>Disponible</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for horario in horarios %}
-        <tr>
-          <td>{{ horario.medico }}</td>
-          <td>{{ horario.dia }}</td>
-          <td>{{ horario.get_horario_display }}</td>
-          <td>{{ horario.disponible|yesno:"Sí,No" }}</td>
-          <td>
-            <a href="{% url 'horario_detail' horario.pk %}" class="btn btn-info btn-sm">Ver</a>
-            {% if request.user.profile.tipo_usuario == 'administrador' %}
-            <a href="{% url 'horario_edit' horario.pk %}" class="btn btn-warning btn-sm">Editar</a>
-            <a href="{% url 'horario_delete' horario.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
-            {% endif %}
-          </td>
-        </tr>
-      {% empty %}
-        <tr>
-          <td colspan="5">No hay horarios disponibles.</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Encabezado del formulario -->
+            <div class="card shadow-sm mb-5">
+                <div class="card-body">
+                    <h1 class="mb-4 text-center text-primary">Horarios del Médico</h1>
+
+                    <!-- Formulario de filtros -->
+                    <form method="get" class="mb-4">
+                        <div class="form-group">
+                            <label for="id_medico">
+                                <i class="fas fa-user-md text-info"></i> Médico
+                            </label>
+                            {{ form.medico }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_dia">
+                                <i class="far fa-calendar-alt text-info"></i> Día
+                            </label>
+                            {{ form.dia }}
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Horarios disponibles en estilo visual -->
+                    <div class="horarios-container mt-4">
+                        {% for horario_key, horario_label in all_horarios %}
+                            {% if horario_key in horarios_filtrados %}
+                            <label class="horario-slot horario-no-disponible">
+                                <input type="checkbox" disabled checked>
+                                <span>{{ horario_label }}</span>
+                            </label>
+                            {% else %}
+                            <label class="horario-slot">
+                                <input type="checkbox" disabled>
+                                <span>{{ horario_label }}</span>
+                            </label>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                                            <!-- Barra de progreso estática (sin funcionalidad) -->
+                                            <div class="progress mt-4">
+                                              <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                          </div>
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+<!-- Estilos personalizados -->
+<style>
+  .card {
+      border: none;
+      border-radius: 15px;
+  }
+
+  .horarios-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .horario-slot input[type="checkbox"] {
+    width: 20px !important;  /* Ajusta el tamaño del checkbox */
+    height: 20px !important; /* Ajusta el tamaño del checkbox */
+    visibility: visible !important; /* Asegura que el checkbox sea visible */
+    margin-right: 10px; /* Espacio entre el checkbox y el texto */
+}
+
+.horario-slot {
+    display: inline-block;
+    width: 110px;
+    height: 70px;
+    margin: 10px;
+    padding: 15px;
+    text-align: center;
+    border: 2px solid #ced4da;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: white;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.horario-slot:hover {
+    background-color: #e3f2fd;
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
+
+.horario-slot input[type="checkbox"]:checked + span {
+    background-color: #007bff;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.progress {
+    height: 20px;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    background-color: #007bff;
+}
+
+label {
+    font-weight: bold;
+}
+
+button.btn-lg {
+    font-size: 18px;
+}
+</style>
+
