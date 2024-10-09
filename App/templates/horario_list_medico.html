@@ -1,0 +1,50 @@
+{% extends "nav.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Encabezado del formulario -->
+            <div class="card shadow-sm mb-5">
+                <div class="card-body">
+                    <h1 class="mb-4 text-center text-primary">Mis Horarios</h1>
+
+                    <!-- Formulario de filtros -->
+                    <form method="get" class="mb-4">
+                        <div class="form-group">
+                            <label for="id_dia">
+                                <i class="far fa-calendar-alt text-info"></i> Día
+                            </label>
+                            {{ form.dia }}
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                <i class="fas fa-search"></i> Ver Horarios
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if all_horarios %}
+                    <!-- Horarios disponibles en estilo visual -->
+                    <div class="horarios-container mt-4">
+                        {% for horario_key, horario_label in all_horarios %}
+                            {% if horario_key in horarios_filtrados %}
+                            <label class="horario-slot">
+                                <input type="checkbox" disabled checked>
+                                <span>{{ horario_label }}</span>
+                            </label>
+                            {% else %}
+                            <label class="horario-slot">
+                                <input type="checkbox" disabled>
+                                <span>{{ horario_label }}</span>
+                            </label>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

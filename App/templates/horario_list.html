@@ -37,8 +37,8 @@
                         <div class="horarios-container mt-4">
                             {% for horario_key, horario_label in all_horarios %}
                                 {% if horario_key in horarios_filtrados %}
-                                <label class="horario-slot horario-no-disponible">
-                                    <input type="checkbox" disabled checked>
+                                <label class="horario-slot">
+                                    <input type="checkbox" name="horarios" value="{{ horario_key }}" checked>
                                     <span>{{ horario_label }}</span>
                                 </label>
                                 {% else %}
@@ -50,12 +50,12 @@
                             {% endfor %}
                         </div>
 
-                        <!-- Botón para registrar nuevos horarios -->
+                        <!-- Botón para registrar o eliminar horarios -->
                         <div class="text-center mt-4">
                             <input type="hidden" name="medico" value="{{ medico_id }}">
                             <input type="hidden" name="dia" value="{{ dia }}">
                             <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-save"></i> Registrar nuevos horarios
+                                <i class="fas fa-save"></i> Actualizar horarios
                             </button>
                         </div>
                     </form>
@@ -66,6 +66,7 @@
     </div>
 </div>
 {% endblock %}
+
 
 <!-- Estilos personalizados -->
 <style>

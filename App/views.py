@@ -361,7 +361,7 @@ class HorarioListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        return self.request.user.profile.tipo_usuario in ['medico', 'administrador']
+        return self.request.user.profile.tipo_usuario in ['administrador']
 
     def handle_no_permission(self):
         return redirect('home')
@@ -378,6 +378,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from .models import Horario
 from .forms import HorarioMultipleForm
+from .models import Medico
 
 class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
     form_class = HorarioMultipleForm
@@ -389,17 +390,23 @@ class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
         dia = request.POST.get('dia')
         horarios_seleccionados = request.POST.getlist('horarios')
 
-        if medico_id and dia and horarios_seleccionados:
+        if medico_id and dia:
             medico = Medico.objects.get(id=medico_id)
+            horarios_existentes = Horario.objects.filter(medico=medico, dia=dia)
 
-            # Crear un registro por cada horario seleccionado, si no existe ya
+            # Crear nuevos horarios si no existen
             for horario in horarios_seleccionados:
-                if not Horario.objects.filter(medico=medico, dia=dia, horario=horario).exists():
+                if not horarios_existentes.filter(horario=horario).exists():
                     Horario.objects.create(medico=medico, dia=dia, horario=horario, disponible=True)
 
-            messages.success(self.request, f'Se han creado {len(horarios_seleccionados)} horarios para el médico {medico}.')
+            # Eliminar los horarios desmarcados
+            for horario in horarios_existentes:
+                if horario.horario not in horarios_seleccionados:
+                    horario.delete()
+
+            messages.success(self.request, 'Horarios actualizados correctamente para el médico.')
         else:
-            messages.error(self.request, 'Faltan datos para crear los horarios.')
+            messages.error(self.request, 'Faltan datos para actualizar los horarios.')
 
         return redirect(self.success_url)
 
@@ -409,17 +416,47 @@ class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
     def handle_no_permission(self):
         return redirect('home')
 
+############vista de horario para medicos########################################
 
+from .models import Horario, Medico
+from django.views.generic import ListView
+from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-# Actualizar un horario existente (solo administradores)
-class HorarioUpdateView(UserPassesTestMixin, UpdateView):
+class HorarioMedicoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Horario
-    form_class = HorarioMultipleForm
-    template_name = 'horario_form.html'
-    success_url = reverse_lazy('horario_list')
+    template_name = 'horario_list_medico.html'
+    context_object_name = 'horarios'
+
+    def get_queryset(self):
+        # Filtrar los horarios por el médico autenticado y la fecha seleccionada
+        medico = self.request.user.profile.medico_profile
+        dia = self.request.GET.get('dia')
+
+        if dia:
+            # Mostrar solo los horarios del médico autenticado en la fecha seleccionada
+            return Horario.objects.filter(medico=medico, dia=dia)
+        return Horario.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = HorarioFilterForm(self.request.GET or None)
+
+        dia = self.request.GET.get('dia')
+
+        if dia:
+            horarios_filtrados = self.get_queryset()
+            horarios_dict = {horario.horario: horario for horario in horarios_filtrados}
+
+            context['all_horarios'] = Horario.HORARIOS  # Todos los horarios posibles
+            context['horarios_filtrados'] = horarios_dict  # Diccionario de horarios ya ocupados por clave
+            context['dia'] = dia
+
+        return context
 
     def test_func(self):
-        return self.request.user.profile.tipo_usuario == 'administrador'
+        # Solo los médicos pueden acceder a esta vista
+        return self.request.user.profile.tipo_usuario == 'medico'
 
     def handle_no_permission(self):
         return redirect('home')
@@ -444,6 +481,19 @@ class HorarioDetailView(LoginRequiredMixin, DetailView):
     template_name = 'horario_detail.html'
     context_object_name = 'horario'
 
+
+# Actualizar un horario existente (solo administradores)
+class HorarioUpdateView(UserPassesTestMixin, UpdateView):
+    model = Horario
+    form_class = HorarioMultipleForm
+    template_name = 'horario_form.html'
+    success_url = reverse_lazy('horario_list')
+
+    def test_func(self):
+        return self.request.user.profile.tipo_usuario == 'administrador'
+
+    def handle_no_permission(self):
+        return redirect('home')
 
 
 #########vistas citas##################################

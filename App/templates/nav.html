@@ -27,11 +27,17 @@
                         <a class="nav-link" href="{% url 'cita_list' %}">Citas</a>
                     </li>
                     {% endif %}
-                    {% if request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'administrador' %}
+                    {% if request.user.profile.tipo_usuario == 'administrador' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'horario_list' %}">Horarios</a>
                     </li>
                     {% endif %}
+                    {% if request.user.profile.tipo_usuario == 'medico'%}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'mis_horarios' %}">Horarios</a>
+                    </li>
+                    {% endif %}
+
                     {% if request.user.profile.tipo_usuario == 'administrador' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'user_list' %}">Usuarios</a>
