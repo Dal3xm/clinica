@@ -379,11 +379,26 @@ from django.views.generic import CreateView
 from .models import Horario
 from .forms import HorarioMultipleForm
 from .models import Medico
-
 class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
     form_class = HorarioMultipleForm
     template_name = 'horario_form.html'
     success_url = reverse_lazy('horario_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        medico_id = self.request.GET.get('medico')
+        dia = self.request.GET.get('dia')
+
+        if medico_id and dia:
+            medico = Medico.objects.get(id=medico_id)
+            horarios_existentes = Horario.objects.filter(medico=medico, dia=dia)
+
+            # Crear una lista de los horarios que tienen citas asociadas
+            horarios_bloqueados = [horario.horario for horario in horarios_existentes if Cita.objects.filter(horario=horario).exists()]
+
+            context['horarios_bloqueados'] = horarios_bloqueados  # Pasar los horarios bloqueados al contexto
+
+        return context
 
     def post(self, request, *args, **kwargs):
         medico_id = request.POST.get('medico')
@@ -393,22 +408,32 @@ class HorarioMultipleCreateView(UserPassesTestMixin, CreateView):
         if medico_id and dia:
             medico = Medico.objects.get(id=medico_id)
             horarios_existentes = Horario.objects.filter(medico=medico, dia=dia)
+            errors = False
 
             # Crear nuevos horarios si no existen
             for horario in horarios_seleccionados:
                 if not horarios_existentes.filter(horario=horario).exists():
                     Horario.objects.create(medico=medico, dia=dia, horario=horario, disponible=True)
 
-            # Eliminar los horarios desmarcados
+            # Eliminar los horarios desmarcados, solo si no tienen citas asociadas
             for horario in horarios_existentes:
                 if horario.horario not in horarios_seleccionados:
-                    horario.delete()
+                    # Verificar si el horario tiene citas asociadas
+                    if Cita.objects.filter(horario=horario).exists():
+                        messages.error(self.request, f'No se puede eliminar el horario {horario.get_horario_display()} porque ya tiene una cita agendada.')
+                        errors = True
+                    else:
+                        horario.delete()
+
+            if errors:
+                # Si hubo errores, volver a renderizar el formulario con los mensajes
+                return self.get(request, *args, **kwargs)
 
             messages.success(self.request, 'Horarios actualizados correctamente para el médico.')
+            return redirect(self.success_url)
         else:
             messages.error(self.request, 'Faltan datos para actualizar los horarios.')
-
-        return redirect(self.success_url)
+            return self.get(request, *args, **kwargs)
 
     def test_func(self):
         return self.request.user.profile.tipo_usuario == 'administrador'

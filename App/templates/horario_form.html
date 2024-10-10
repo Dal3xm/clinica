@@ -4,18 +4,17 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <!-- Encabezado del formulario -->
+
+            <!-- Formulario -->
             <div class="card shadow-sm mb-5">
                 <div class="card-body">
                     <h1 class="mb-4 text-center text-primary">
                         {% if object %}Editar Horario{% else %}Crear Horarios{% endif %}
                     </h1>
 
-                    <!-- Formulario -->
                     <form method="post">
                         {% csrf_token %}
                         
-                        <!-- Campo del Médico -->
                         <div class="form-group">
                             <label for="id_medico">
                                 <i class="fas fa-user-md text-info"></i> Médico
@@ -23,7 +22,6 @@
                             {{ form.medico }}
                         </div>
 
-                        <!-- Campo de la Fecha -->
                         <div class="form-group">
                             <label for="id_dia">
                                 <i class="far fa-calendar-alt text-info"></i> Día
@@ -31,27 +29,33 @@
                             {{ form.dia }}
                         </div>
 
-                        <!-- Campo de Horarios -->
                         <div class="form-group">
                             <label for="id_horarios">
                                 <i class="far fa-clock text-info"></i> Horarios Disponibles
                             </label>
-                            <div class="horarios-container">
+                            <div class="horarios-container mt-4">
                                 {% for horario in form.horarios %}
-                                    <label class="horario-slot">
-                                        {{ horario.tag }}
-                                        <span>{{ horario.choice_label }}</span>
-                                    </label>
+                                    {% if horario.value in horarios_filtrados %}
+                                        {% if horario.value in horarios_bloqueados %}
+                                            <label class="horario-slot">
+                                                <input type="checkbox" disabled checked>
+                                                <span>{{ horario.choice_label }} (Cita agendada)</span>
+                                            </label>
+                                        {% else %}
+                                            <label class="horario-slot">
+                                                <input type="checkbox" name="horarios" value="{{ horario.value }}" checked>
+                                                <span>{{ horario.choice_label }}</span>
+                                            </label>
+                                        {% endif %}
+                                    {% else %}
+                                        <label class="horario-slot">
+                                            <input type="checkbox" name="horarios" value="{{ horario.value }}">
+                                            <span>{{ horario.choice_label }}</span>
+                                        </label>
+                                    {% endif %}
                                 {% endfor %}
                             </div>
-                        </div>
 
-                        <!-- Barra de progreso estática (sin funcionalidad) -->
-                        <div class="progress mt-4">
-                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-
-                        <!-- Botones de acción -->
                         <div class="mt-4 text-center">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-plus-circle"></i> 
@@ -67,74 +71,47 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para mostrar mensajes (si hay) -->
+{% if messages %}
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">Notificación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="closeModalButton" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
-<!-- Estilos personalizados -->
-<style>
-    .card {
-        border: none;
-        border-radius: 15px;
-    }
+<!-- Script para mostrar el modal y redirigir -->
+{% block extra_js %}
+<script>
+    // Mostrar el modal si hay mensajes
+    document.addEventListener('DOMContentLoaded', function () {
+        var myModal = new bootstrap.Modal(document.getElementById('messageModal'), {});
+        if (document.querySelector('.alert')) {
+            myModal.show();
+        }
 
-    .horarios-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .horario-slot input[type="checkbox"] {
-    width: 20px !important;  /* Ajusta el tamaño del checkbox */
-    height: 20px !important; /* Ajusta el tamaño del checkbox */
-    visibility: visible !important; /* Asegura que el checkbox sea visible */
-    margin-right: 10px; /* Espacio entre el checkbox y el texto */
-}
-
-.horario-slot {
-    display: inline-block;
-    width: 110px;
-    height: 70px;
-    margin: 10px;
-    padding: 15px;
-    text-align: center;
-    border: 2px solid #ced4da;
-    border-radius: 10px;
-    cursor: pointer;
-    background-color: white;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.horario-slot:hover {
-    background-color: #e3f2fd;
-    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
-}
-
-.horario-slot input[type="checkbox"]:checked + span {
-    background-color: #007bff;
-    color: white;
-    padding: 8px;
-    border-radius: 8px;
-}
-
-.progress {
-    height: 20px;
-    border-radius: 10px;
-}
-
-.progress-bar {
-    background-color: #007bff;
-}
-
-label {
-    font-weight: bold;
-}
-
-button.btn-lg {
-    font-size: 18px;
-}
-</style>
+        // Redirigir al cerrar el modal
+        document.getElementById('closeModalButton').addEventListener('click', function () {
+            window.location.href = "{% url 'horario_list' %}";
+        });
+    });
+</script>
+{% endblock %}
