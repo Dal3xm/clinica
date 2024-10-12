@@ -530,6 +530,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Cita
 
 # Crear una nueva cita (pacientes, médicos, secretarias)
+# Crear una nueva cita (pacientes, médicos, secretarias)
 class CitaCreateView(LoginRequiredMixin, CreateView):
     model = Cita
     form_class = CitaForm
@@ -545,6 +546,8 @@ class CitaCreateView(LoginRequiredMixin, CreateView):
         if self.request.user.profile.tipo_usuario == 'paciente':
             form.instance.usuario = self.request.user
         return super().form_valid(form)
+
+
 
 
 # Actualizar una cita existente (administradores, secretarias)

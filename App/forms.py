@@ -393,11 +393,6 @@ from django.utils import timezone
 from .models import Cita, Horario
 from django.contrib.auth.models import User
 
-from django import forms
-from django.utils import timezone
-from .models import Cita, Horario
-from django.contrib.auth.models import User
-
 class CitaForm(forms.ModelForm):
     class Meta:
         model = Cita
@@ -439,8 +434,6 @@ class CitaForm(forms.ModelForm):
             raise forms.ValidationError("Este horario ya está reservado. Por favor, selecciona otro.")
         
         return horario
-
-
 
 ############################FORMULARIO HISTORIAL CLINICO#####################################
 
