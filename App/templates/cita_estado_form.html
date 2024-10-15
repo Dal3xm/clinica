@@ -1,0 +1,39 @@
+{% extends "nav.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Encabezado del formulario -->
+            <div class="card shadow-sm mb-5">
+                <div class="card-body">
+                    <h1 class="mb-4 text-center text-primary">Cambiar Estado de la Cita</h1>
+
+                    <!-- Formulario para actualizar el estado de la cita -->
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+
+                        <!-- Botón para actualizar el estado -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+  .card {
+      border: none;
+      border-radius: 15px;
+  }
+  button.btn-lg {
+      font-size: 18px;
+  }
+</style>

@@ -530,42 +530,107 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Cita
 
 # Crear una nueva cita (pacientes, médicos, secretarias)
-# Crear una nueva cita (pacientes, médicos, secretarias)
-class CitaCreateView(LoginRequiredMixin, CreateView):
-    model = Cita
-    form_class = CitaForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import View
+from .models import Medico, Horario, Paciente, Cita
+from django.contrib import messages
+from datetime import datetime
+
+class CitaCreateView(LoginRequiredMixin, View):
     template_name = 'cita_form.html'
-    success_url = reverse_lazy('cita_list')
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
+    def get(self, request):
+        # Obtenemos la lista de médicos
+        medicos = Medico.objects.all()
+        medico_seleccionado = request.GET.get('medico')
 
-    def form_valid(self, form):
-        if self.request.user.profile.tipo_usuario == 'paciente':
-            form.instance.usuario = self.request.user
-        return super().form_valid(form)
+        # Obtener la lista de pacientes si el usuario no es un paciente
+        pacientes = []
+        paciente_seleccionado = request.GET.get('paciente')  # Obtenemos el paciente seleccionado
+        if request.user.profile.tipo_usuario in ['administrador', 'secretaria', 'medico']:
+            pacientes = Paciente.objects.all()
+
+        # Obtener la fecha seleccionada
+        fecha_seleccionada = request.GET.get('fecha')
+
+        # Inicializamos una lista de horarios vacía
+        horarios = []
+
+        # Si hay un médico y una fecha seleccionados, obtenemos los horarios disponibles para ese médico en la fecha
+        if medico_seleccionado and fecha_seleccionada:
+            medico = Medico.objects.get(pk=medico_seleccionado)
+            try:
+                fecha_seleccionada_dt = datetime.strptime(fecha_seleccionada, '%Y-%m-%d').date()
+                horarios = Horario.objects.filter(medico=medico, dia=fecha_seleccionada_dt, disponible=True)
+            except ValueError:
+                pass  # Si la fecha no tiene el formato adecuado, no hacemos nada
+
+        context = {
+            'medicos': medicos,
+            'pacientes': pacientes,  # Solo si no es un paciente logueado
+            'medico_seleccionado': medico_seleccionado,
+            'fecha_seleccionada': fecha_seleccionada,
+            'paciente_seleccionado': paciente_seleccionado,  # Pasamos el paciente seleccionado al contexto
+            'horarios': horarios,
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        # Recibir los datos del formulario
+        medico_id = request.POST.get('medico')
+        horario_id = request.POST.get('horario')
+
+        # Verificar que todos los datos estén presentes
+        if not medico_id or not horario_id:
+            messages.error(request, "Por favor selecciona un médico y un horario.")
+            return redirect('cita_create')
+
+        # Obtener el horario
+        horario = get_object_or_404(Horario, pk=horario_id)
+
+        # Si el usuario es paciente, tomamos request.user directamente
+        if request.user.profile.tipo_usuario == 'paciente':
+            usuario = request.user
+        else:
+            # Si es administrador, médico o secretaria, seleccionamos el paciente del formulario
+            paciente_id = request.POST.get('paciente')
+            if not paciente_id:
+                messages.error(request, "Por favor selecciona un paciente.")
+                return redirect('cita_create')
+            usuario = get_object_or_404(Paciente, pk=paciente_id).user_profile.user
+
+        # Crear la cita
+        Cita.objects.create(usuario=usuario, horario=horario)
+
+        # Marcar el horario como no disponible
+        horario.disponible = False
+        horario.save()
+
+        messages.success(request, "Cita registrada con éxito.")
+        return redirect('cita_list')
+
 
 
 
 
 # Actualizar una cita existente (administradores, secretarias)
-class CitaUpdateView(LoginRequiredMixin, UpdateView):
+from django.urls import reverse_lazy
+from django.views.generic import UpdateView
+from django.contrib import messages
+from .models import Cita
+from .forms import CitaEstadoForm
+
+class CitaUpdateEstadoView(LoginRequiredMixin, UpdateView):
     model = Cita
-    form_class = CitaForm
-    template_name = 'cita_form.html'
-    success_url = reverse_lazy('cita_list')
+    form_class = CitaEstadoForm  # Usamos un formulario simplificado solo para el estado
+    template_name = 'cita_estado_form.html'  # Template simplificado
+    success_url = reverse_lazy('cita_list')  # Redirigir a la lista de citas después de actualizar
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
+    def form_valid(self, form):
+        messages.success(self.request, "Estado de la cita actualizado con éxito.")
+        return super().form_valid(form)
 
-    def get_queryset(self):
-        if self.request.user.profile.tipo_usuario in ['administrador', 'secretaria']:
-            return Cita.objects.all()
-        return Cita.objects.filter(usuario=self.request.user)
 
 
 # Eliminar una cita (administradores, secretarias)

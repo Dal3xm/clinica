@@ -8,7 +8,7 @@ from .views import (
     HorarioListView,HorarioUpdateView,HorarioDeleteView)
 
 from .views import HorarioListView, HorarioMultipleCreateView, HorarioUpdateView, HorarioDeleteView, HorarioDetailView
-from .views import CitaListView, CitaCreateView, CitaUpdateView, CitaDeleteView, CitaDetailView, PacienteHistorialClinicoListView, HorarioMedicoListView
+from .views import CitaListView, CitaCreateView, CitaDeleteView, CitaDetailView, PacienteHistorialClinicoListView, HorarioMedicoListView,CitaUpdateEstadoView
 
 urlpatterns = [
     path('', defaultView, name='defaultView'),
@@ -37,8 +37,8 @@ urlpatterns = [
     path('citas/', CitaListView.as_view(), name='cita_list'),
     path('citas/nueva/', CitaCreateView.as_view(), name='cita_create'),
     path('citas/<int:pk>/', CitaDetailView.as_view(), name='cita_detail'),
-    path('citas/<int:pk>/editar/', CitaUpdateView.as_view(), name='cita_edit'),
     path('citas/<int:pk>/eliminar/', CitaDeleteView.as_view(), name='cita_delete'),
+    path('citas/<int:pk>/editar-estado/', CitaUpdateEstadoView.as_view(), name='cita_editar_estado'),
 
     # URLs para Historial Clinico
     path('historiales/', HistorialClinicoListView.as_view(), name='historial_list'),

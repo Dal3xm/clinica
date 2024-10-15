@@ -1,13 +1,167 @@
 {% extends "nav.html" %}
 
 {% block content %}
-  <h1>{% if object %}Editar Cita{% else %}Crear Cita{% endif %}</h1>
-  
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">{% if object %}Actualizar{% else %}Crear{% endif %}</button>
-  </form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Encabezado del formulario -->
+            <div class="card shadow-sm mb-5">
+                <div class="card-body">
+                    <h1 class="mb-4 text-center text-primary">Reservar Cita</h1>
 
-  <a href="{% url 'cita_list' %}" class="btn btn-secondary mt-3">Volver a la lista de citas</a>
+                    <!-- Selección de Paciente (si el usuario no es paciente logueado) -->
+                    {% if pacientes %}
+                    <form method="get" class="mb-4">
+                        <div class="form-group">
+                            <label for="paciente">
+                                <i class="fas fa-user text-info"></i> Selecciona un Paciente
+                            </label>
+                            <select id="paciente" name="paciente" class="form-control" onchange="this.form.submit();">
+                                <option value="">--- Selecciona un Paciente ---</option>
+                                {% for paciente in pacientes %}
+                                <option value="{{ paciente.id }}" {% if paciente.id|stringformat:"s" == paciente_seleccionado|stringformat:"s" %}selected{% endif %}>
+                                    {{ paciente.user_profile.user.first_name }} {{ paciente.user_profile.user.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                    {% endif %}
+
+                    <!-- Selección de Médico -->
+                    <form method="get">
+                        {% if paciente_seleccionado %}
+                        <input type="hidden" name="paciente" value="{{ paciente_seleccionado }}">  <!-- Mantener el valor -->
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label for="medico">
+                                <i class="fas fa-user-md text-info"></i> Selecciona un Médico
+                            </label>
+                            <select id="medico" name="medico" class="form-control" onchange="this.form.submit();">
+                                <option value="">--- Selecciona un Médico ---</option>
+                                {% for medico in medicos %}
+                                <option value="{{ medico.id }}" {% if medico.id|stringformat:"s" == medico_seleccionado|stringformat:"s" %}selected{% endif %}>
+                                    Dr. {{ medico.user_profile.user.first_name }} {{ medico.user_profile.user.last_name }} - {{ medico.especialidad.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+
+                    <!-- Selección de Fecha -->
+                    {% if medico_seleccionado %}
+                    <form method="get">
+                        {% if paciente_seleccionado %}
+                        <input type="hidden" name="paciente" value="{{ paciente_seleccionado }}"> <!-- Mantener el valor -->
+                        {% endif %}
+                        <input type="hidden" name="medico" value="{{ medico_seleccionado }}">
+
+                        <div class="form-group">
+                            <label for="fecha">
+                                <i class="far fa-calendar-alt text-info"></i> Selecciona una Fecha
+                            </label>
+                            <input type="date" id="fecha" name="fecha" class="form-control" value="{{ fecha_seleccionada }}" onchange="this.form.submit();" required>
+                        </div>
+                    </form>
+                    {% endif %}
+
+                    <!-- Mostrar los horarios disponibles -->
+                    {% if fecha_seleccionada and medico_seleccionado %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if paciente_seleccionado %}
+                        <input type="hidden" name="paciente" value="{{ paciente_seleccionado }}"> <!-- Mantener el valor -->
+                        {% endif %}
+                        <input type="hidden" name="medico" value="{{ medico_seleccionado }}">
+
+                        <h2 class="text-center text-primary mt-5">Horarios disponibles</h2>
+
+                        <div class="horarios-container mt-4">
+                            {% if horarios %}
+                            <div class="form-group">
+                                <label for="horario"><i class="far fa-clock text-info"></i> Selecciona un Horario</label>
+                                <select id="horario" name="horario" class="form-control" required>
+                                    {% for horario in horarios %}
+                                    <option value="{{ horario.id }}">
+                                        {{ horario.dia }} - {{ horario.get_horario_display }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% else %}
+                            <p class="text-center text-muted">No hay horarios disponibles para este médico en la fecha seleccionada.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Botón para registrar la cita -->
+                        {% if horarios %}
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-calendar-check"></i> Registrar Cita
+                            </button>
+                        </div>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+
+
+<!-- Estilos personalizados para citas -->
+<style>
+  .card {
+      border: none;
+      border-radius: 15px;
+  }
+
+  .horarios-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .horario-slot {
+    display: inline-block;
+    width: 140px;
+    height: 80px;
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 2px solid #ced4da;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: white;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+.horario-slot:hover {
+    background-color: #e3f2fd;
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
+
+.horario-slot span {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+label {
+    font-weight: bold;
+}
+
+button.btn-lg {
+    font-size: 18px;
+}
+</style>

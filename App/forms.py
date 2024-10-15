@@ -435,6 +435,23 @@ class CitaForm(forms.ModelForm):
         
         return horario
 
+
+
+from django import forms
+from .models import Cita
+
+class CitaEstadoForm(forms.ModelForm):
+    class Meta:
+        model = Cita
+        fields = ['estado']  # Solo incluimos el campo estado
+
+        widgets = {
+            'estado': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+
+
 ############################FORMULARIO HISTORIAL CLINICO#####################################
 
 from .models import HistorialClinico
