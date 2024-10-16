@@ -1,14 +1,27 @@
-<!-- historial_confirm_delete.html -->
-
 {% extends "nav.html" %}
 
 {% block content %}
-    <h2>¿Estás seguro que quieres eliminar este historial clínico?</h2>
-    <p><strong>Paciente:</strong> {{ object.paciente }}</p>
-    <p><strong>Fecha:</strong> {{ object.fecha }}</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Eliminar</button>
-        <a href="{% url 'historial_list' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h2 class="text-danger mb-4">¿Estás seguro que quieres eliminar este historial clínico?</h2>
+                    <p><strong>Paciente:</strong> {{ object.paciente.user_profile.user.first_name }} {{ object.paciente.user_profile.user.last_name }}</p>
+                    <p><strong>Fecha:</strong> {{ object.fecha|date:"d M Y" }}</p>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                        <a href="{% url 'historial_list' %}" class="btn btn-secondary btn-lg ml-3">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

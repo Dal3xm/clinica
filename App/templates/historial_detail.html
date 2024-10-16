@@ -2,36 +2,46 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Historial Clínico de {{ historial_clinico.paciente.user_profile.user.first_name }} {{ historial_clinico.paciente.user_profile.user.last_name }}</h2>
-    
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Detalles del Historial Clínico</h5>
-            <p class="card-text"><strong>Fecha:</strong> {{ historial_clinico.fecha }}</p>
-            <p class="card-text"><strong>Diagnóstico:</strong> {{ historial_clinico.diagnostico }}</p>
-            <p class="card-text"><strong>Tratamiento:</strong> {{ historial_clinico.tratamiento }}</p>
-            <p class="card-text"><strong>Observaciones:</strong> 
-                {% if historial_clinico.observaciones %}
-                    {{ historial_clinico.observaciones }}
-                {% else %}
-                    <em>No hay observaciones adicionales</em>
-                {% endif %}
-            </p>
-        </div>
-    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="text-center mb-4">Historial Clínico de {{ historial_clinico.paciente.user_profile.user.first_name }} {{ historial_clinico.paciente.user_profile.user.last_name }}</h2>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Detalles del Historial Clínico</h5>
+                    <p class="card-text"><strong>Fecha:</strong> {{ historial_clinico.fecha|date:"d M Y" }}</p>
+                    <p class="card-text"><strong>Diagnóstico:</strong> {{ historial_clinico.diagnostico }}</p>
+                    <p class="card-text"><strong>Tratamiento:</strong> {{ historial_clinico.tratamiento }}</p>
+                    <p class="card-text"><strong>Observaciones:</strong>
+                        {% if historial_clinico.observaciones %}
+                            {{ historial_clinico.observaciones }}
+                        {% else %}
+                            <em>No hay observaciones adicionales</em>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
 
-    <div class="mt-4">
-        <!-- Mostrar botón de Editar solo si el usuario es un médico -->
-        {% if request.user.profile.tipo_usuario == 'medico' %}
-            <a href="{% url 'historial_update' historial_clinico.pk %}" class="btn btn-warning">Editar</a>
-        {% endif %}
-        
-        <!-- Mostrar botón de Eliminar solo si el usuario es administrador o secretaria -->
-        {% if request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'secretaria' %}
-            <a href="{% url 'historial_delete' historial_clinico.pk %}" class="btn btn-danger">Eliminar</a>
-        {% endif %}
-        
-        <a href="{% url 'historial_list' %}" class="btn btn-secondary">Volver a la lista</a>
+            <div class="text-center mt-4">
+                <!-- Mostrar botón de Editar solo si el usuario es un médico -->
+                {% if request.user.profile.tipo_usuario == 'medico' %}
+                    <a href="{% url 'historial_update' historial_clinico.pk %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                {% endif %}
+                
+                <!-- Mostrar botón de Eliminar solo si el usuario es administrador o secretaria -->
+                {% if request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'secretaria' %}
+                    <a href="{% url 'historial_delete' historial_clinico.pk %}" class="btn btn-danger btn-lg ml-2">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </a>
+                {% endif %}
+                
+                <a href="{% url 'historial_list' %}" class="btn btn-secondary btn-lg ml-2">
+                    <i class="fas fa-arrow-left"></i> Volver a la lista
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

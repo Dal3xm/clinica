@@ -1,60 +1,104 @@
-{% extends 'nav.html' %}
-{% load static %}
+{% extends "nav.html" %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Usuarios - Farmacia Las Américas</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
 {% block content %}
-<body>
-    <div class="container mt-5">
-        <h1>Lista de Usuarios</h1>
-        
-        <!-- Filtro de usuarios por tipo -->
-        <form method="get" class="form-inline mb-3">
-            <div class="form-group mr-3">
-                <label for="tipo_usuario" class="mr-2">Filtrar por tipo de usuario:</label>
-                <select name="tipo_usuario" id="tipo_usuario" class="form-control">
-                    <option value="">Todos</option>
-                    <option value="paciente" {% if selected_filter == 'paciente' %}selected{% endif %}>Pacientes</option>
-                    <option value="medico" {% if selected_filter == 'medico' %}selected{% endif %}>Médicos</option>
-                    <option value="administrador" {% if selected_filter == 'administrador' %}selected{% endif %}>Administradores</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Aplicar Filtro</button>
-        </form>
-        
-        <a href="{% url 'user_create' %}" class="btn btn-primary mb-3">Crear Usuario</a>
-        
-        <ul class="list-group">
-            {% for user in users %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        {{ user.username }} - {{ user.first_name }} {{ user.last_name }} - {{ user.email }} - 
-                        {{ user.profile.get_tipo_usuario_display }}
-                    </div>
-                    <div>
-                        {% if user.profile.tipo_usuario == 'paciente' %}
-                            <a href="{% url 'paciente_historiales' user.pk %}" class="btn btn-sm btn-success">Ver Historiales Clínicos</a>
-                        {% endif %}
-                        <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning">Editar Usuario</a>
-                        <a href="{% url 'user_profile_edit' user.pk %}" class="btn btn-sm btn-info">Editar Perfil</a>
-                        <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
-                    </div>
-                </li>
-            {% empty %}
-                <li class="list-group-item text-center">No hay usuarios disponibles.</li>
-            {% endfor %}
-        </ul>
+<div class="container mt-5">
+    <!-- Título principal -->
+    <h1 class="text-center text-primary">Lista de Usuarios</h1>
+
+    <!-- Filtro de usuarios por tipo -->
+    <form method="get" class="form-inline mb-4 d-flex justify-content-center">
+        <div class="form-group mr-3">
+            <label for="tipo_usuario" class="mr-2">Filtrar por tipo de usuario:</label>
+            <select name="tipo_usuario" id="tipo_usuario" class="form-control">
+                <option value="">Todos</option>
+                <option value="paciente" {% if selected_filter == 'paciente' %}selected{% endif %}>Pacientes</option>
+                <option value="secretaria" {% if selected_filter == 'secretaria' %}selected{% endif %}>Secretarias</option>
+                <option value="medico" {% if selected_filter == 'medico' %}selected{% endif %}>Médicos</option>
+                <option value="administrador" {% if selected_filter == 'administrador' %}selected{% endif %}>Administradores</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary shadow-sm">Aplicar Filtro</button>
+    </form>
+
+    <!-- Botón para crear un nuevo usuario -->
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{% url 'user_create' %}" class="btn btn-success btn-lg shadow">
+            <i class="fas fa-user-plus"></i> Crear Usuario
+        </a>
     </div>
-    
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+
+    <!-- Lista de usuarios -->
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover table-bordered">
+            <thead class="bg-primary text-white text-center">
+                <tr>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Tipo de Usuario</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.profile.get_tipo_usuario_display }}</td>
+                    <td>
+                        {% if user.profile.tipo_usuario == 'paciente' %}
+                            <a href="{% url 'paciente_historiales' user.pk %}" class="btn btn-sm btn-success shadow">
+                                <i class="fas fa-notes-medical"></i> Historiales
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-warning shadow">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'user_profile_edit' user.pk %}" class="btn btn-sm btn-info shadow">
+                            <i class="fas fa-user-cog"></i> Perfil
+                        </a>
+                        <a href="{% url 'user_delete' user.pk %}" class="btn btn-sm btn-danger shadow">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay usuarios disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
-</html>
+
+<!-- Estilos personalizados -->
+<style>
+    .btn-lg {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+
+    .shadow-sm {
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .table thead th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-sm {
+        padding: 8px 12px;
+    }
+</style>

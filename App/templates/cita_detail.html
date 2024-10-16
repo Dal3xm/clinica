@@ -1,44 +1,71 @@
 {% extends "nav.html" %}
 
 {% block content %}
-  <h1>Detalles de la Cita</h1>
-  
-  <ul class="list-group">
-    <li class="list-group-item"><strong>Usuario:</strong> {{ cita.usuario }}</li>
-    <li class="list-group-item"><strong>Horario:</strong> {{ cita.horario }}</li>
-    <li class="list-group-item"><strong>Estado:</strong> {{ cita.get_estado_display }}</li>
-    <li class="list-group-item"><strong>Fecha de Creación:</strong> {{ cita.fecha_creacion }}</li>
-  </ul>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="text-center text-primary mb-4">Detalles de la Cita</h1>
 
-  {% if paciente %}
-    <div class="mt-3">
-      <!-- Enlace al perfil del paciente -->
-      {% if request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'paciente' %}
-      <a href="{% url 'paciente_profile' paciente.user_profile.pk %}" class="btn btn-info">Ver Perfil del Paciente</a>
-      {% endif %}
-    <!-- Mostrar un resumen de los historiales clínicos -->
-    <h2 class="mt-4">Historiales Clínicos Recientes</h2>
-    <ul class="list-group">
-      {% for historial in historiales_clinicos %}
-        <li class="list-group-item">
-          <strong>Fecha:</strong> {{ historial.fecha }}<br>
-          <strong>Diagnóstico:</strong> {{ historial.diagnostico|truncatewords:10 }}<br>
-          <strong>Tratamiento:</strong> {{ historial.tratamiento|truncatewords:10 }}
-          <a href="{% url 'historial_detail' historial.pk %}" class="btn btn-primary btn-sm float-right">Ver más</a>
-        </li>
-      {% empty %}
-        <li class="list-group-item">No hay historiales clínicos disponibles.</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+                    <!-- Información de la cita -->
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item"><strong>Usuario:</strong> {{ cita.usuario.first_name }} {{ cita.usuario.last_name }}</li>
+                        <li class="list-group-item"><strong>Horario:</strong> {{ cita.horario }}</li>
+                        <li class="list-group-item"><strong>Estado:</strong> {{ cita.get_estado_display }}</li>
+                        <li class="list-group-item"><strong>Fecha de Creación:</strong> {{ cita.fecha_creacion|date:"d M Y - H:i" }}</li>
+                    </ul>
 
-  <!-- Botones para editar, eliminar y volver -->
-  {% if request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'secretaria' %}
-  <a href="{% url 'cita_edit' cita.pk %}" class="btn btn-warning mt-3">Editar</a>
-  <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger mt-3">Eliminar</a>
-  {% endif %}
-  <a href="{% url 'cita_list' %}" class="btn btn-secondary mt-3">Volver a la lista de citas</a>
-  {% if request.user.profile.tipo_usuario == 'medico'%}
-  <a href="{% url 'historial_create' %}" class="btn btn-warning mt-3">Crear nuevo historial clínico</a>
-  {% endif %}
+                    <!-- Mostrar perfil y historiales clínicos si hay un paciente -->
+                    {% if paciente %}
+                    <div class="text-center mt-4">
+                        {% if request.user.profile.tipo_usuario == 'medico' or request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'paciente' %}
+                        <a href="{% url 'paciente_profile' paciente.user_profile.pk %}" class="btn btn-info mb-4">
+                            <i class="fas fa-user"></i> Ver Perfil del Paciente
+                        </a>
+                        {% endif %}
+
+                        <!-- Mostrar historiales clínicos recientes -->
+                        <h2 class="h4 text-primary mb-3">Historiales Clínicos Recientes</h2>
+                        <ul class="list-group">
+                            {% for historial in historiales_clinicos %}
+                            <li class="list-group-item">
+                                <strong>Fecha:</strong> {{ historial.fecha }}<br>
+                                <strong>Diagnóstico:</strong> {{ historial.diagnostico|truncatewords:10 }}<br>
+                                <strong>Tratamiento:</strong> {{ historial.tratamiento|truncatewords:10 }}
+                                <a href="{% url 'historial_detail' historial.pk %}" class="btn btn-primary btn-sm float-right">
+                                    Ver más
+                                </a>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item text-center">No hay historiales clínicos disponibles.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <!-- Botones de acciones -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'cita_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver a la lista de citas
+                        </a>
+                        {% if request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'secretaria' %}
+                        <a href="{% url 'cita_editar_estado' cita.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </a>
+                        {% endif %}
+                        {% if request.user.profile.tipo_usuario == 'medico' %}
+                        <a href="{% url 'historial_create' %}" class="btn btn-warning">
+                            <i class="fas fa-file-medical"></i> Crear Historial Clínico
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

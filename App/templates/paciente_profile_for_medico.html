@@ -1,13 +1,44 @@
 {% extends "nav.html" %}
+
 {% block content %}
 <div class="container mt-5">
-    <h3>Perfil de Paciente</h3>
-    <p><strong>DPI:</strong> {{ profile_data.dpi }}</p>
-    <p><strong>Fecha de Nacimiento:</strong> {{ profile_data.fecha_nacimiento }}</p>
-    <p><strong>Dirección:</strong> {{ profile_data.direccion }}</p>
-    <p><strong>Teléfono:</strong> {{ profile_data.telefono }}</p>
-    <p><strong>Seguro Médico:</strong> {{ profile_data.seguro_medico }}</p>
-    <p><strong>Tipo de Sangre:</strong> {{ profile_data.blood_type }}</p>
-    <p><strong>Padecimientos:</strong> {{ profile_data.conditions }}</p>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="text-primary mb-4">Perfil del Paciente</h3>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>DPI:</strong> {{ profile_data.dpi }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Fecha de Nacimiento:</strong> {{ profile_data.fecha_nacimiento|date:"d M Y" }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Dirección:</strong> {{ profile_data.direccion }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Teléfono:</strong> {{ profile_data.telefono }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Seguro Médico:</strong> 
+                    {% if profile_data.seguro_medico %}
+                        {{ profile_data.seguro_medico }}
+                    {% else %}
+                        <em>No especificado</em>
+                    {% endif %}
+                </li>
+                <li class="list-group-item">
+                    <strong>Tipo de Sangre:</strong> {{ profile_data.blood_type }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Padecimientos:</strong>
+                    {% if profile_data.conditions %}
+                        {{ profile_data.conditions }}
+                    {% else %}
+                        <em>No especificados</em>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -226,6 +226,9 @@ from django.http import HttpResponseForbidden
 
 # Vistas para Historial Clinico
 # Lista de historiales clínicos
+from django.db.models import Q
+from django.utils import timezone
+
 class HistorialClinicoListView(ListView):
     model = HistorialClinico
     template_name = 'historial_list.html'
@@ -233,13 +236,42 @@ class HistorialClinicoListView(ListView):
 
     def get_queryset(self):
         user_profile = self.request.user.profile
+        queryset = HistorialClinico.objects.all()
+
+        # Filtrar historiales basados en el tipo de usuario
         if user_profile.tipo_usuario == 'medico':
-            return HistorialClinico.objects.all()
+            queryset = HistorialClinico.objects.all()
         elif user_profile.tipo_usuario == 'paciente':
-            return HistorialClinico.objects.filter(paciente__user_profile=user_profile)
+            queryset = HistorialClinico.objects.filter(paciente__user_profile=user_profile)
         elif user_profile.tipo_usuario == 'administrador':
-            return HistorialClinico.objects.all()
-        return HistorialClinico.objects.none()
+            queryset = HistorialClinico.objects.all()
+        else:
+            queryset = HistorialClinico.objects.none()
+
+        # Obtener los parámetros de búsqueda
+        nombre_paciente = self.request.GET.get('nombre_paciente', '')
+        fecha = self.request.GET.get('fecha', '')
+
+        # Filtrar por nombre de paciente
+        if nombre_paciente:
+            queryset = queryset.filter(
+                Q(paciente__user_profile__user__first_name__icontains=nombre_paciente) | 
+                Q(paciente__user_profile__user__last_name__icontains=nombre_paciente)
+            )
+
+        # Filtrar por fecha
+        if fecha:
+            queryset = queryset.filter(fecha=fecha)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pasar los valores de los filtros al contexto
+        context['nombre_paciente'] = self.request.GET.get('nombre_paciente', '')
+        context['fecha'] = self.request.GET.get('fecha', '')
+        return context
+
 
 
 # Detalles de un historial clínico
@@ -663,6 +695,8 @@ class CitaDetailView(LoginRequiredMixin, DetailView):
 
 # Listar las citas del usuario autenticado (todos los roles)
 from django.utils import timezone
+from django.db.models import Q
+
 class CitaListView(LoginRequiredMixin, ListView):
     model = Cita
     template_name = 'cita_list.html'
@@ -672,15 +706,41 @@ class CitaListView(LoginRequiredMixin, ListView):
         user_profile = self.request.user.profile
         today = timezone.now().date()
 
+        queryset = Cita.objects.all()
+
         # Filtrar citas basadas en el tipo de usuario
         if user_profile.tipo_usuario in ['administrador', 'secretaria']:
-            return Cita.objects.filter(horario__dia__gte=today)
+            queryset = queryset.filter(horario__dia__gte=today)
         elif user_profile.tipo_usuario == 'paciente':
-            return Cita.objects.filter(usuario=self.request.user, horario__dia__gte=today)
+            queryset = Cita.objects.filter(usuario=self.request.user, horario__dia__gte=today)
         elif user_profile.tipo_usuario == 'medico':
-            return Cita.objects.filter(horario__medico=user_profile.medico_profile, horario__dia__gte=today)
-        
-        return Cita.objects.none()
+            queryset = Cita.objects.filter(horario__medico=user_profile.medico_profile, horario__dia__gte=today)
+        else:
+            queryset = Cita.objects.none()
+
+        # Obtener los parámetros del filtro de búsqueda
+        nombre_paciente = self.request.GET.get('nombre_paciente', '')
+        fecha = self.request.GET.get('fecha', '')
+
+        # Filtrar por nombre de paciente
+        if nombre_paciente:
+            queryset = queryset.filter(
+                Q(usuario__first_name__icontains=nombre_paciente) | 
+                Q(usuario__last_name__icontains=nombre_paciente)
+            )
+
+        # Filtrar por fecha de la cita
+        if fecha:
+            queryset = queryset.filter(horario__dia=fecha)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Añadir los valores de los filtros al contexto
+        context['nombre_paciente'] = self.request.GET.get('nombre_paciente', '')
+        context['fecha'] = self.request.GET.get('fecha', '')
+        return context
 
 
 # ####################Otras vistas existentes###########

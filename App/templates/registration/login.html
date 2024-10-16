@@ -6,12 +6,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Matazano</title>
-    <link type='text/css' href='{% static "css/loginStyle.css" %}' rel='stylesheet'/>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Estilos del contenedor de login */
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .login-container img {
+            max-width: 120px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Estilo del botón */
+        .btn-success {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        .btn-success:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* Enlaces */
+        p a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        p a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Estilo de alerta de errores */
+        .alert-danger {
+            font-size: 14px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
-        <img src='{% static "img/logo.png" %}' alt="Logo">
+        <img src="{% static 'img/logo.png' %}" alt="Logo">
+
         <form action="" method="post">
             {% csrf_token %}
             {% if form.errors %}
@@ -34,8 +96,9 @@
             </div>
             <button type="submit" class="btn btn-success btn-block">Iniciar Sesión</button>
         </form>
-        <p>¿No tienes cuente? <a href="{% url 'patient_signup'%}">Registrarse</a></p>
+        <p>¿No tienes cuenta? <a href="{% url 'patient_signup' %}">Registrarse</a></p>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

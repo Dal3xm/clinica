@@ -6,78 +6,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Pacientes</title>
-    <link type='text/css' href='{% static "css/formStyle.css" %}' rel='stylesheet'/>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Contenedor del formulario */
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .form-container img {
+            max-width: 120px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        /* Estilo de los inputs */
+        .form-control {
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        /* Botón de registrar */
+        .btn-success {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        .btn-success:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* Estilo de mensajes de error */
+        .alert-danger {
+            font-size: 14px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="form-container">
-            <img src='{% static "img/logo.png" %}' alt="Logo">
-            <form method="post">
-                {% csrf_token %}
-                {% if form.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        {% endfor %}
-                        {% for error in form.non_field_errors %}
+    <div class="form-container">
+        <img src="{% static 'img/logo.png' %}" alt="Logo">
+        
+        <form method="post">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for field in form %}
+                        {% for error in field.errors %}
                             <p>{{ error }}</p>
                         {% endfor %}
-                    </div>
-                {% endif %}
-                <div class="form-group">
-                    {{ form.username }}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
                 </div>
-                <div class="form-group">
-                    {{ form.first_name }}
-                </div>
-                <div class="form-group">
-                    {{ form.last_name }}
-                </div>
-                <div class="form-group">
-                    {{ form.email }}
-                </div>
-                <div class="form-group">
-                    {{ form.password1 }}
-                </div>
-                <div class="form-group">
-                    {{ form.password2 }}
-                </div>
-                <!-- Campos adicionales específicos de paciente -->
-                <div class="form-group">
-                    {{ form.dpi.label_tag }} 
-                    {{ form.dpi }}
-                </div>
-                <div class="form-group">
-                    {{ form.fecha_nacimiento.label_tag }} 
-                    {{ form.fecha_nacimiento }}
-                </div>
-                <div class="form-group">
-                    {{ form.direccion.label_tag }} 
-                    {{ form.direccion }}
-                </div>
-                <div class="form-group">
-                    {{ form.telefono.label_tag }} 
-                    {{ form.telefono }}
-                </div>
-                <div class="form-group">
-                    {{ form.seguro_medico.label_tag }} 
-                    {{ form.seguro_medico }}
-                </div>
-                <div class="form-group">
-                    {{ form.blood_type.label_tag }} 
-                    {{ form.blood_type }}
-                </div>
-                <div class="form-group">
-                    {{ form.conditions.label_tag }} 
-                    {{ form.conditions }}
-                </div>
-                <button type="submit" class="btn btn-success btn-block">Registrar</button>
-            </form>
-        </div>
+            {% endif %}
+            
+            <!-- Campos del usuario -->
+            <div class="form-group">
+                {{ form.username.label_tag }} 
+                {{ form.username }}
+            </div>
+            <div class="form-group">
+                {{ form.first_name.label_tag }} 
+                {{ form.first_name }}
+            </div>
+            <div class="form-group">
+                {{ form.last_name.label_tag }} 
+                {{ form.last_name }}
+            </div>
+            <div class="form-group">
+                {{ form.email.label_tag }} 
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                {{ form.password1.label_tag }} 
+                {{ form.password1 }}
+            </div>
+            <div class="form-group">
+                {{ form.password2.label_tag }} 
+                {{ form.password2 }}
+            </div>
+            
+            <!-- Campos adicionales específicos de paciente -->
+            <div class="form-group">
+                {{ form.dpi.label_tag }} 
+                {{ form.dpi }}
+            </div>
+            <div class="form-group">
+                {{ form.fecha_nacimiento.label_tag }} 
+                {{ form.fecha_nacimiento }}
+            </div>
+            <div class="form-group">
+                {{ form.direccion.label_tag }} 
+                {{ form.direccion }}
+            </div>
+            <div class="form-group">
+                {{ form.telefono.label_tag }} 
+                {{ form.telefono }}
+            </div>
+            <div class="form-group">
+                {{ form.seguro_medico.label_tag }} 
+                {{ form.seguro_medico }}
+            </div>
+            <div class="form-group">
+                {{ form.blood_type.label_tag }} 
+                {{ form.blood_type }}
+            </div>
+            <div class="form-group">
+                {{ form.conditions.label_tag }} 
+                {{ form.conditions }}
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block">Registrar</button>
+        </form>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

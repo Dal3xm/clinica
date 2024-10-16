@@ -2,46 +2,88 @@
 
 {% block content %}
 <div class="container mt-5">
-  <h1 class="text-center">Lista de Citas</h1>
-  
-  <div class="d-flex justify-content-between mb-3">
-    <a href="{% url 'cita_create' %}" class="btn btn-primary">Crear Nueva Cita</a>
-  </div>
-  
-  <div class="table-responsive">
-    <table class="table table-striped table-bordered">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">Paciente</th> <!-- Cambié "Usuario" a "Paciente" para mayor claridad -->
-          <th scope="col">Horario</th>
-          <th scope="col">Estado</th>
-          <th scope="col">Fecha de Creación</th>
-          <th scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for cita in citas %}
-          <tr>
-            <!-- Mostrar nombre completo del usuario (nombre y apellido) -->
-            <td>{{ cita.usuario.first_name }} {{ cita.usuario.last_name }}</td>
-            <td>{{ cita.horario }}</td>
-            <td>{{ cita.get_estado_display }}</td>
-            <td>{{ cita.fecha_creacion }}</td>
-            <td>
-              <a href="{% url 'cita_detail' cita.pk %}" class="btn btn-info btn-sm">Ver</a>
-              {% if request.user.profile.tipo_usuario != 'medico' %}
-              <a href="{% url 'cita_editar_estado' cita.pk %}" class="btn btn-warning btn-sm">Editar</a>
-              <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
-              {% endif %}
-            </td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="5" class="text-center">No hay citas disponibles.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <!-- Título principal -->
+    <h1 class="text-center text-primary">Lista de Citas</h1>
+
+    <!-- Filtro de citas -->
+    {% if request.user.profile.tipo_usuario != 'paciente' %}
+    <form method="get" class="form-inline mb-4 d-flex justify-content-center">
+        <div class="form-group mr-3">
+            <label for="nombre_paciente" class="mr-2">Buscar por Paciente:</label>
+            <input type="text" name="nombre_paciente" id="nombre_paciente" class="form-control" placeholder="Nombre del Paciente" value="{{ nombre_paciente }}">
+        </div>
+        <div class="form-group mr-3">
+            <label for="fecha" class="mr-2">Filtrar por Fecha:</label>
+            <input type="date" name="fecha" id="fecha" class="form-control" value="{{ fecha }}">
+        </div>
+        <button type="submit" class="btn btn-primary shadow-sm">Aplicar Filtro</button>
+    </form>
+    {% endif %}
+    <!-- Botón para crear una nueva cita -->
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{% url 'cita_create' %}" class="btn btn-success btn-lg shadow">
+            <i class="fas fa-calendar-plus"></i> Crear Nueva Cita
+        </a>
+    </div>
+
+    <!-- Tabla de citas -->
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover table-bordered">
+            <thead class="bg-primary text-white text-center">
+                <tr>
+                    <th scope="col">Paciente</th> 
+                    <th scope="col">Horario</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Fecha de Creación</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for cita in citas %}
+                <tr>
+                    <td>{{ cita.usuario.first_name }} {{ cita.usuario.last_name }}</td>
+                    <td>{{ cita.horario }}</td>
+                    <td>
+                        {% if cita.estado == 'pendiente' %}
+                            <span class="badge badge-warning">{{ cita.get_estado_display }}</span>
+                        {% elif cita.estado == 'confirmada' %}
+                            <span class="badge badge-success">{{ cita.get_estado_display }}</span>
+                        {% else %}
+                            <span class="badge badge-danger">{{ cita.get_estado_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ cita.fecha_creacion|date:"d M Y - H:i" }}</td>
+                    <td>
+                        <a href="{% url 'cita_detail' cita.pk %}" class="btn btn-info btn-sm shadow">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                        {% if request.user.profile.tipo_usuario == 'administrador' or request.user.profile.tipo_usuario == 'secretaria' %}
+                        <a href="{% url 'cita_editar_estado' cita.pk %}" class="btn btn-warning btn-sm shadow">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger btn-sm shadow">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay citas disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
+
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .table thead th {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
