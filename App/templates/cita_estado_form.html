@@ -10,13 +10,13 @@
                     <h1 class="mb-4 text-center text-primary">Cambiar Estado de la Cita</h1>
 
                     <!-- Formulario para actualizar el estado de la cita -->
-                    <form method="post">
+                    <form id="estado-form" method="post">
                         {% csrf_token %}
                         {{ form.as_p }}
 
-                        <!-- Botón para actualizar el estado -->
+                        <!-- Botón para actualizar el estado (abre el modal de confirmación) -->
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-success btn-lg">
+                            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#confirmModal">
                                 <i class="fas fa-save"></i> Guardar Cambios
                             </button>
                         </div>
@@ -26,8 +26,37 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar Cambios</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas guardar los cambios en el estado de esta cita?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirm-submit" class="btn btn-success">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para manejar el envío del formulario después de confirmar -->
+<script>
+    document.getElementById('confirm-submit').addEventListener('click', function() {
+        document.getElementById('estado-form').submit(); // Enviar el formulario después de confirmar
+    });
+</script>
 {% endblock %}
 
+<!-- Estilos personalizados -->
 <style>
   .card {
       border: none;

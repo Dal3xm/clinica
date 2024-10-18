@@ -155,7 +155,7 @@ class UserSelfUpdateView(LoginRequiredMixin, UpdateView):
 # Cada usuario edita su propio perfil
 class EditUserProfileView(LoginRequiredMixin, UpdateView):
     template_name = 'user_profile_edit.html'
-    success_url = reverse_lazy('profile')
+    success_url = reverse_lazy('user_profile_detail')
 
     def get_object(self):
         user_profile = get_object_or_404(UserProfile, user=self.request.user)

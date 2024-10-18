@@ -12,7 +12,7 @@
                         {% if object %}Editar Horario{% else %}Crear Horarios{% endif %}
                     </h1>
 
-                    <form method="post">
+                    <form id="horario-form" method="post">
                         {% csrf_token %}
                         
                         <div class="form-group">
@@ -57,7 +57,8 @@
                             </div>
 
                         <div class="mt-4 text-center">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <!-- Botón que abre el modal de confirmación -->
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#confirmModal">
                                 <i class="fas fa-plus-circle"></i> 
                                 {% if object %}Actualizar{% else %}Crear Horarios{% endif %}
                             </button>
@@ -72,14 +73,43 @@
     </div>
 </div>
 
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar Acción</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% if object %}
+                    ¿Estás seguro de que deseas actualizar este horario?
+                {% else %}
+                    ¿Estás seguro de que deseas crear este horario?
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirm-submit" class="btn btn-primary">
+                    {% if object %}Actualizar{% else %}Crear{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal para mostrar mensajes (si hay) -->
 {% if messages %}
 <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="messageModalLabel">Notificación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 {% for message in messages %}
@@ -89,7 +119,7 @@
                 {% endfor %}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="closeModalButton" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" id="closeModalButton" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -98,17 +128,22 @@
 
 {% endblock %}
 
-<!-- Script para mostrar el modal y redirigir -->
+<!-- Script para manejar el envío del formulario después de confirmar -->
 {% block extra_js %}
 <script>
-    // Mostrar el modal si hay mensajes
+    // Al hacer clic en el botón de confirmar en el modal, se envía el formulario
+    document.getElementById('confirm-submit').addEventListener('click', function() {
+        document.getElementById('horario-form').submit(); // Enviar el formulario después de confirmar
+    });
+
+    // Mostrar el modal de mensajes si hay mensajes de éxito o error
     document.addEventListener('DOMContentLoaded', function () {
         var myModal = new bootstrap.Modal(document.getElementById('messageModal'), {});
         if (document.querySelector('.alert')) {
             myModal.show();
         }
 
-        // Redirigir al cerrar el modal
+        // Redirigir al cerrar el modal de mensajes
         document.getElementById('closeModalButton').addEventListener('click', function () {
             window.location.href = "{% url 'horario_list' %}";
         });

@@ -1,5 +1,4 @@
 {% extends "nav.html" %}
-
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -68,7 +67,7 @@
 
                     <!-- Mostrar los horarios disponibles -->
                     {% if fecha_seleccionada and medico_seleccionado %}
-                    <form method="post">
+                    <form id="cita-form" method="post">
                         {% csrf_token %}
                         {% if paciente_seleccionado %}
                         <input type="hidden" name="paciente" value="{{ paciente_seleccionado }}"> <!-- Mantener el valor -->
@@ -97,7 +96,7 @@
                         <!-- Botón para registrar la cita -->
                         {% if horarios %}
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-success btn-lg">
+                            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#confirmModal">
                                 <i class="fas fa-calendar-check"></i> Registrar Cita
                             </button>
                         </div>
@@ -109,9 +108,35 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar Reserva de Cita</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas reservar esta cita?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirm-submit" class="btn btn-success">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para manejar el envío del formulario después de confirmar -->
+<script>
+    document.getElementById('confirm-submit').addEventListener('click', function() {
+        document.getElementById('cita-form').submit(); // Enviar el formulario después de confirmar
+    });
+</script>
 {% endblock %}
-
-
 
 <!-- Estilos personalizados para citas -->
 <style>
